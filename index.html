@@ -1,5 +1,6 @@
 
 
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -57,9 +58,7 @@ select{ padding:8px; margin:10px; border-radius:4px; }
         
         <h3>Speed Event</h3>
         <select id="speedEvent">
-            <option value="1
-            ">
-              Normal Speed</option>
+            <option value="1">Normal Speed</option>
             <option value="1.2">120% Event</option>
         </select>
         <h3>Enter Quantity</h3>
@@ -181,12 +180,16 @@ function calculateGems(){
 }
 
 /* TROOP CALCULATOR CONFIG */
-const GITHUB_BASE = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/";
 const ICONS = {
-    army: GITHUB_BASE + "Picsart_26-03-17_22-21-29-563.png", might: GITHUB_BASE + "Picsart_26-03-17_22-24-27-109.png",
-    food: GITHUB_BASE + "Picsart_26-03-17_22-31-19-118.png", stone: GITHUB_BASE + "Picsart_26-03-17_22-31-37-917.png",
-    wood: GITHUB_BASE + "Picsart_26-03-17_22-31-57-627.png", ore: GITHUB_BASE + "Picsart_26-03-17_22-32-16-895.png", gold: GITHUB_BASE + "Picsart_26-03-17_22-32-37-505.png"
+    army: "Picsart_26-03-17_22-21-29-563.png", 
+    might: "Picsart_26-03-17_22-24-27-109.png",
+    food: "Picsart_26-03-17_22-31-19-118.png", 
+    stone: "Picsart_26-03-17_22-31-37-917.png",
+    wood: "Picsart_26-03-17_22-31-57-627.png", 
+    ore: "Picsart_26-03-17_22-32-16-895.png", 
+    gold: "Picsart_26-03-17_22-32-37-505.png"
 };
+
 document.getElementById('h-army').src = ICONS.army;
 document.getElementById('h-might').src = ICONS.might;
 
