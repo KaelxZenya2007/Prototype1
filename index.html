@@ -1,152 +1,198 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Lords Mobile Toolkit - Integrated</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Lords Mobile Toolkit</title>
 <style>
-    /* --- GLOBAL FIXES --- */
-    body{ font-family:Arial; background:#f4f4f4; text-align:center; margin:0; padding:20px; }
-    .container{ max-width:700px; margin:auto; background:white; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.2); position: relative; }
+    /* =========================================
+       1. GLOBAL TOOLKIT STYLES (Light Theme)
+       ========================================= */
+    * { box-sizing: border-box; }
+    html, body { overflow-x: hidden; width: 100%; }
+    body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #f4f4f4; text-align: center; margin: 0; padding: 10px; color: #333; }
     
-    /* FIX: Force buttons and inputs to be block-level to prevent side-by-side snapping */
-    button { 
-        display: block; 
-        width: 260px; 
-        margin: 10px auto; 
-        padding: 10px 15px; 
-        border: none; 
-        border-radius: 6px; 
-        background: #007bff; 
-        color: white; 
-        cursor: pointer; 
-        font-weight: bold; 
-    }
-    button:hover{ background:#0056b3; }
+    .container { max-width: 900px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    h1 { margin-top: 5px; font-size: 24px; }
+    h2 { margin-top: 5px; }
+    
+    .menu-btn { display: block; width: 100%; max-width: 280px; margin: 10px auto; padding: 12px; border: none; border-radius: 8px; background: #007bff; color: white; cursor: pointer; font-weight: bold; font-size: 15px; }
+    .menu-btn:hover { background: #0056b3; }
+    .tool-input, .tool-select { display: block; width: 100%; max-width: 280px; margin: 10px auto; padding: 12px; border: 1px solid #ccc; border-radius: 6px; text-align: center; font-size: 14px; }
+    
+    .tool { display: none; width: 100%; padding-bottom: 10px; }
+    .guide { display: none; background: #eef; padding: 15px; border-radius: 6px; margin: 15px auto; font-size: 14px; max-width: 280px; border: 1px solid #ccd; text-align: left; }
 
-    input { 
-        display: block; 
-        width: 260px; 
-        margin: 10px auto; 
-        padding: 10px; 
-        text-align: center; 
-        border: 1px solid #ccc; 
-        border-radius: 4px; 
-        box-sizing: border-box; /* Crucial for width alignment */
-    }
-
-    select { 
-        display: block; 
-        width: 260px; 
-        margin: 10px auto; 
-        padding: 10px; 
-        border-radius: 4px; 
-    }
-
-    .tool { display:none; padding-bottom: 20px; }
-
-    /* FIX: Guide alignment */
-    .guide { 
-        display: none; 
-        background: #eef; 
-        padding: 15px; 
-        border-radius: 6px; 
-        margin: 15px auto; 
-        font-size: 14px; 
-        width: 260px; 
-        box-sizing: border-box;
-        border: 1px solid #ccd;
-    }
-
-    /* --- TROOP CALCULATOR FIXES --- */
+    /* =========================================
+       2. TROOP & CALC CSS
+       ========================================= */
     .game-icon { height: 20px; width: auto; vertical-align: middle; background: #eee; border-radius: 3px; }
-    .sticky-stats { position: sticky; top: -20px; z-index: 100; background: #fdfdfd; padding: 10px; display: flex; justify-content: space-around; border-bottom: 2px solid #eee; margin-bottom: 15px; }
+    .sticky-stats { position: sticky; top: 0; z-index: 10; background: #fff; padding: 10px 0; display: flex; justify-content: space-around; border-bottom: 2px solid #eee; margin-bottom: 15px; }
     .stat-item { display: flex; align-items: center; font-weight: 800; font-size: 16px; gap: 6px; color: #333; }
-    
-    /* Settings Grid */
-    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; background: #f9f9f9; padding: 15px; border-radius: 8px; border: 1px solid #eee; }
-    .settings-grid input { width: 100%; margin: 0; } /* Overrides global block margin for grid */
-    
+    .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; background: #f9f9f9; padding: 12px; border-radius: 8px; border: 1px solid #eee; }
+    .input-group { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; text-align: left; }
+    .input-group label { font-size: 10px; font-weight: 800; color: #666; text-transform: uppercase; margin-bottom: 4px; }
+    .input-group input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 0; }
+    .input-group input[type="checkbox"] { width: 20px; height: 20px; margin: 8px 0; cursor: pointer; }
     .tier-row { border-bottom: 1px solid #eee; padding: 15px 0; }
-    .tier-header { font-weight: 800; color: #007bff; margin-bottom: 10px; font-size: 14px; }
-    .tier-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
-    
-    /* Keep Troop Inputs Inline inside the grid */
-    .troop-box input { display: inline-block; width: 100%; padding: 6px 2px; margin: 0; font-size: 12px; }
-    .troop-box label { display: block; font-size: 9px; font-weight: bold; color: #888; }
+    .tier-header { font-weight: 800; color: #007bff; margin-bottom: 10px; font-size: 14px; text-align: left; }
+    .tier-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .troop-box input { width: 100%; padding: 8px 4px; margin: 0; font-size: 13px; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
+    .troop-box label { display: block; font-size: 10px; font-weight: bold; color: #888; text-align: center; margin-bottom: 3px; }
 
-    /* Result Overlay */
-    .resultTab{ display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index: 999; }
-    .resultBox{ background:white; padding:25px; border-radius:10px; width:340px; position:relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-    .closeBtn{ position:absolute; right:12px; top:8px; font-weight:bold; cursor:pointer; color:red; font-size: 20px; }
-    .resultGrid{ display:grid; grid-template-columns:1fr auto; row-gap:8px; margin-top:15px; font-size:16px; }
-    .resultGrid div{ text-align:left; display: flex; align-items: center; gap: 8px; }
-    .resultGrid span{ text-align:right; font-weight: bold; }
-    .totalRow{ margin-top:15px; padding-top:10px; border-top:2px solid #ccc; font-weight:bold; display:grid; grid-template-columns:1fr auto; color: #007bff; font-size: 18px; }
-    .precise-time { font-family: monospace; background: #333; color: #00ff00; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 20px; }
+    /* Result Overlay (Toolkit) */
+    .resultTab { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
+    .resultBox { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 360px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+    .closeBtn { position: absolute; right: 15px; top: 10px; font-weight: bold; cursor: pointer; color: red; font-size: 20px; }
+    .resultGrid { display: grid; grid-template-columns: 1fr auto; row-gap: 8px; margin-top: 15px; font-size: 15px; }
+    .resultGrid div { text-align: left; display: flex; align-items: center; gap: 8px; }
+    .totalRow { margin-top: 15px; padding-top: 10px; border-top: 2px solid #ccc; font-weight: bold; display: grid; grid-template-columns: 1fr auto; color: #007bff; font-size: 18px; }
+    .precise-time { font-family: monospace; background: #333; color: #00ff00; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 18px; text-align: center; }
+
+    /* =========================================
+       3. GEAR SIMULATOR CSS
+       ========================================= */
+    #gearTool {
+      --bg: #0f1220; --panel: #1a1f3a; --panel-2: #202644; --text: #fff; 
+      --muted: #b6bddf; --accent: #7c9cff; --border: rgba(255,255,255,0.08);
+      --danger: #ff4d4d; --danger-dark: #cc0000;
+      background: var(--bg); color: var(--text); padding: 15px; border-radius: 12px; margin-top: 10px;
+    }
+    #gearTool .wrap { max-width: 1000px; margin: 0 auto; }
+    #gearTool .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; }
+    #gearTool .tabs { display: flex; gap: 5px; }
+    #gearTool .tab { padding: 8px 16px; background: var(--panel); border: 1px solid var(--border); color: var(--muted); border-radius: 6px; cursor: pointer; transition: 0.2s; font-size:14px; font-family: inherit;}
+    #gearTool .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    #gearTool .reset-all-btn { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; font-family: inherit;}
+    #gearTool .reset-all-btn:hover { background: var(--danger-dark); }
+    
+    /* Categorized Stats Display */
+    #gearTool .stats-container { background: var(--panel); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); display: flex; gap: 15px; }
+    #gearTool .stat-col { flex: 1; text-align: left; }
+    #gearTool .stat-col-divider { width: 1px; background: var(--border); }
+    #gearTool .stat-header { font-weight: bold; color: var(--accent); margin-bottom: 10px; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; text-align: center;}
+    #gearTool .stat-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
+    #gearTool .stat-row span { color: var(--muted); }
+    
+    /* Rigid Grid & Slots for Perfect Alignment */
+    #gearTool .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+    
+    #gearTool .slot { background: var(--panel); border-radius: 12px; padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; border: 1px solid var(--border); height: 100%; min-height: 160px;}
+    
+    #gearTool .slot-label { color: var(--accent); font-weight: bold; text-transform: uppercase; font-size: 10px; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;}
+    
+    #gearTool .img-box { width: 100%; aspect-ratio: 1/1; background: #242b4d; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); margin: 0 auto; position: relative; flex: 0 0 auto;}
+    #gearTool .img-box img { width: 100%; height: 100%; object-fit: cover; }
+    
+    #gearTool .img-box.empty-box { cursor: pointer; border: 1px dashed rgba(255,255,255,0.3); transition: 0.2s; }
+    #gearTool .img-box.empty-box:hover { border-color: var(--accent); background: #2a325a; }
+    
+    #gearTool .btn { cursor: pointer; border: none; border-radius: 4px; padding: 6px; font-size: 11px; font-weight: bold; color: white; background: #3d4670; transition: 0.2s; width: 100%; margin:0; font-family: inherit;}
+    #gearTool .btn:hover { background: #4e5a8f; }
+    #gearTool .btn-plus { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); font-size: 24px; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+    
+    #gearTool .actions-group { display: flex; flex-direction: column; gap: 4px; margin-top: auto; padding-top: 8px; width: 100%; }
+    #gearTool .btn-clear { background: rgba(255, 77, 77, 0.15); color: var(--danger); border: 1px solid var(--danger); }
+    #gearTool .btn-clear:hover { background: var(--danger); color: white; }
+
+    /* Gear Modal CSS */
+    .g-modal-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; z-index: 2000; padding: 20px; align-items: center; justify-content: center; font-family: 'Segoe UI', Tahoma, sans-serif;}
+    .g-modal-wrap.open { display: flex; }
+    .g-modal-box { background: #101525; width: 100%; max-width: 500px; max-height: 90vh; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; color:#fff; text-align: left; }
+    .g-modal-header { padding: 15px; background: #1a1f3a; display: flex; justify-content: space-between; align-items: center; gap: 10px;}
+    .g-modal-body { padding: 15px; overflow-y: auto; flex: 1; }
+    .g-modal-body .card { background: #202644; padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: flex-start; gap: 15px; cursor: pointer; }
+    .g-modal-body .card:hover { border-color: #7c9cff; }
+    .g-modal-body .card img { width: 60px; height: 60px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); margin-top: 5px;}
+    .g-modal-body .preview-area { background: #1a1f3a; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #7c9cff; font-size: 14px;}
+    .g-modal-body .jewel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
+    .g-modal-body .socket { background: #242b4d; padding: 8px; border-radius: 6px; font-size: 10px; cursor: pointer; text-align: center; border: 1px solid rgba(255,255,255,0.08); transition: 0.2s; }
+    .g-modal-body .socket:hover { border-color: #7c9cff; }
+    .g-modal-body .btn { cursor: pointer; border: none; border-radius: 4px; padding: 8px; font-size: 12px; font-weight: bold; color: white; background: #3d4670; width: 100%; }
+
+    /* Mobile overrides */
+    @media (max-width: 600px) {
+        .container { padding: 10px; border-radius: 0; box-shadow: none; }
+        .tier-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        #gearTool .top-bar { justify-content: center; }
+        #gearTool .stats-container { flex-direction: column; gap: 5px; }
+        #gearTool .stat-col-divider { width: 100%; height: 1px; margin: 5px 0; }
+        
+        #gearTool .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
+
+        #gearTool .slot { padding: 6px; min-height: 120px;}
+        #gearTool .slot-label { font-size: 9px; margin-bottom: 4px; letter-spacing: -0.5px;}
+        #gearTool .img-box { border-radius: 5px; }
+        #gearTool .btn { padding: 5px 2px; font-size: 10px; }
+        #gearTool .btn-plus { width: 30px; height: 30px; font-size: 20px; }
+        #gearTool .actions-group { gap: 3px; padding-top: 4px;}
+    }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Lords Mobile Toolkit</h1>
+    <h1 id="mainTitle">Lords Mobile Toolkit</h1>
 
     <div id="toolsMenu">
-        <h2>Tools</h2>
-        <button onclick="openTool('speedTool')">Speed Up Calculator</button>
-        <button onclick="openTool('gemTool')">Gem Prediction</button>
-        <button onclick="openTool('troopTool')" style="background:#28a745">Troop Calculator</button>
+        <h2>Select a Tool</h2>
+        <button class="menu-btn" onclick="openTool('speedTool')">Speed Up Calculator</button>
+        <button class="menu-btn" onclick="openTool('gemTool')">Gem Prediction</button>
+        <button class="menu-btn" onclick="openTool('troopTool')" style="background:#28a745">Troop Calculator</button>
+        <button class="menu-btn" onclick="openTool('gearTool')" style="background:#7c9cff; color:#0f1220;">Gear Simulator</button>
     </div>
 
     <div id="speedTool" class="tool">
-        <button onclick="backTools()" style="background:#6c757d; width: 100px;">← Back</button>
+        <button class="menu-btn" onclick="backTools()" style="background:#6c757d; max-width:120px; margin: 0 auto 15px 0;">← Back</button>
         <h2>Speed Up Calculator</h2>
-        <button onclick="toggleGuide('speedGuide')">Show Guide</button>
+        <button class="menu-btn" onclick="toggleGuide('speedGuide')" style="max-width:150px; padding:8px; font-size:12px;">Toggle Guide</button>
         <div id="speedGuide" class="guide">Enter the quantity of each speed up item you have. The calculator will provide the total time.</div>
         
-        <select id="speedEvent">
+        <select id="speedEvent" class="tool-select">
             <option value="1">Normal Speed (100%)</option>
             <option value="1.2">120% Speed Event</option>
         </select>
         
-        <input id="d1" placeholder="1 min">
-        <input id="d5" placeholder="5 min">
-        <input id="d10" placeholder="10 min">
-        <input id="d15" placeholder="15 min">
-        <input id="d30" placeholder="30 min">
-        <input id="h1" placeholder="1 hour">
-        <input id="h3" placeholder="3 hour">
-        <input id="h8" placeholder="8 hour">
-        <input id="h15" placeholder="15 hour">
-        <input id="h24" placeholder="24 hour">
-        <input id="d3" placeholder="3 day">
-        <input id="d7" placeholder="7 day">
-        <input id="d14" placeholder="14 day">
-        <input id="d30s" placeholder="30 day">
+        <input class="tool-input" id="d1" placeholder="1 min">
+        <input class="tool-input" id="d5" placeholder="5 min">
+        <input class="tool-input" id="d10" placeholder="10 min">
+        <input class="tool-input" id="d15" placeholder="15 min">
+        <input class="tool-input" id="d30" placeholder="30 min">
+        <input class="tool-input" id="h1" placeholder="1 hour">
+        <input class="tool-input" id="h3" placeholder="3 hour">
+        <input class="tool-input" id="h8" placeholder="8 hour">
+        <input class="tool-input" id="h15" placeholder="15 hour">
+        <input class="tool-input" id="h24" placeholder="24 hour">
+        <input class="tool-input" id="d3" placeholder="3 day">
+        <input class="tool-input" id="d7" placeholder="7 day">
+        <input class="tool-input" id="d14" placeholder="14 day">
+        <input class="tool-input" id="d30s" placeholder="30 day">
         
-        <button onclick="calculateSpeed()">Calculate Total</button>
-        <button onclick="clearInputs('speedTool')" style="background:#6c757d">Clear All</button>
+        <button class="menu-btn" onclick="calculateSpeed()">Calculate Total</button>
+        <button class="menu-btn" onclick="clearInputs('speedTool')" style="background:#6c757d">Clear All</button>
     </div>
 
     <div id="gemTool" class="tool">
-        <button onclick="backTools()" style="background:#6c757d; width: 100px;">← Back</button>
+        <button class="menu-btn" onclick="backTools()" style="background:#6c757d; max-width:120px; margin: 0 auto 15px 0;">← Back</button>
         <h2>Gem Prediction</h2>
-        <button onclick="toggleGuide('gemGuide')">Show Guide</button>
-        <div id="gemGuide" class="guide">Predict your gems after 30 days based on your current income sources.</div>
+        <button class="menu-btn" onclick="toggleGuide('gemGuide')" style="max-width:150px; padding:8px; font-size:12px;">Toggle Guide</button>
+        <div id="gemGuide" class="guide">Enter your Estimated Gems or What you usually get from each source.</div>
         
-        <input id="colo" placeholder="Colosseum Gems (Every 3h)">
-        <input id="guild" placeholder="Daily Guild Gifts">
-        <input id="monster" placeholder="Daily Monster Hunt">
-        <input id="eventgems" placeholder="Weekly Event Gems">
-        <input id="treasure" placeholder="Treasure Trove Deposit">
-        <input id="basic" placeholder="Basic Interest %">
-        <input id="bonus" placeholder="Bonus Interest %">
+        <input class="tool-input" id="colo" placeholder="Colosseum Gems (Every 3h)">
+        <input class="tool-input" id="guild" placeholder="Daily Guild Gifts">
+        <input class="tool-input" id="monster" placeholder="Daily Monster Hunt">
+        <input class="tool-input" id="eventgems" placeholder="Weekly Event Gems">
+        <input class="tool-input" id="treasure" placeholder="Treasure Trove Deposit">
+        <input class="tool-input" id="basic" placeholder="Basic Interest %">
+        <input class="tool-input" id="bonus" placeholder="Bonus Interest %">
         
-        <button onclick="calculateGems()">Predict 30 Days</button>
-        <button onclick="clearInputs('gemTool')" style="background:#6c757d">Clear</button>
+        <button class="menu-btn" onclick="calculateGems()">Predict 30 Days</button>
+        <button class="menu-btn" onclick="clearInputs('gemTool')" style="background:#6c757d">Clear All</button>
     </div>
 
     <div id="troopTool" class="tool">
-        <button onclick="backTools()" style="background:#6c757d; width: 100px;">← Back</button>
+        <button class="menu-btn" onclick="backTools()" style="background:#6c757d; max-width:120px; margin: 0 auto 15px 0;">← Back</button>
         <div class="sticky-stats">
             <div class="stat-item"><img id="h-army" class="game-icon"> <span id="live-a">0</span></div>
             <div class="stat-item"><img id="h-might" class="game-icon"> <span id="live-m">0</span></div>
@@ -155,11 +201,30 @@
             <div class="input-group"><label>Training Speed %</label><input type="number" id="tSpeed" placeholder="475.05"></div>
             <div class="input-group"><label>T1/T2 Sub %</label><input type="number" id="s12" placeholder="40"></div>
             <div class="input-group"><label>T3/T4 Sub %</label><input type="number" id="s34" placeholder="30"></div>
-            <div class="input-group"><label>120% Event</label><input type="checkbox" id="troopEvent" style="width:20px; height:20px;"></div>
+            <div class="input-group"><label>120% Event</label><input type="checkbox" id="troopEvent"></div>
         </div>
         <div id="tier-container"></div>
-        <button onclick="calculateTroops()" style="background:#28a745; width:80%;">CALCULATE RESOURCES</button>
-        <button onclick="clearInputs('troopTool')" style="background:#6c757d">Reset All</button>
+        <button class="menu-btn" onclick="calculateTroops()" style="background:#28a745; max-width:100%;">CALCULATE RESOURCES</button>
+        <button class="menu-btn" onclick="clearInputs('troopTool')" style="background:#6c757d; max-width:100%;">Reset All</button>
+    </div>
+
+    <div id="gearTool" class="tool">
+        <button class="menu-btn" onclick="backTools()" style="background:#6c757d; max-width:120px; margin: 0 auto 10px 0;">← Back</button>
+        
+        <div class="wrap">
+          <div class="top-bar">
+            <div class="tabs">
+              <button class="tab active" onclick="switchSet(0)">Set 1</button>
+              <button class="tab" onclick="switchSet(1)">Set 2</button>
+              <button class="tab" onclick="switchSet(2)">Set 3</button>
+            </div>
+            <button class="reset-all-btn" onclick="resetEntireSet()">Reset Entire Set</button>
+          </div>
+
+          <div class="stats-container" id="statsDisplay"></div>
+          
+          <div class="grid" id="slotsGrid"></div>
+        </div>
     </div>
 </div>
 
@@ -170,73 +235,102 @@
     </div>
 </div>
 
+<div class="g-modal-wrap" id="mainModal">
+  <div class="g-modal-box">
+    <div class="g-modal-header">
+      <h3 id="modalTitle" style="margin:0;">Select</h3>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" style="width:auto; padding:5px 10px; margin:0; font-size:12px;" onclick="toggleGearSort()">↕ Sort: Lvl</button>
+        <button class="btn btn-clear" style="width:auto; padding:5px 15px; margin:0;" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+    <div class="g-modal-body" id="modalBody"></div>
+  </div>
+</div>
+
 <script>
-    /* Navigation remains the same */
+    // ==========================================
+    // 1. GLOBAL NAVIGATION & UTILS
+    // ==========================================
     function openTool(id){
-        document.getElementById("toolsMenu").style.display="none";
-        document.getElementById(id).style.display="block";
+        document.getElementById("toolsMenu").style.display = "none";
+        document.getElementById("mainTitle").style.display = "none";
+        document.getElementById(id).style.display = "block";
+        if(id === 'gearTool') render();
     }
+    
     function backTools(){
-        document.getElementById("toolsMenu").style.display="block";
-        document.querySelectorAll(".tool").forEach(t => t.style.display="none");
-    }
-    function toggleGuide(id){
-        let g=document.getElementById(id);
-        g.style.display=(g.style.display==="block")?"none":"block";
+        document.getElementById("toolsMenu").style.display = "block";
+        document.getElementById("mainTitle").style.display = "block";
+        document.querySelectorAll(".tool").forEach(t => t.style.display = "none");
     }
 
-    /* Formatting and Parsing logic remains the same */
-    function showResult(content){
-        document.getElementById("resultContent").innerHTML=content;
-        document.getElementById("resultTab").style.display="flex";
+    function toggleGuide(id){
+        let g = document.getElementById(id);
+        g.style.display = (g.style.display === "block") ? "none" : "block";
     }
-    function closeResult(){ document.getElementById("resultTab").style.display="none"; }
+
+    function showResult(content){
+        document.getElementById("resultContent").innerHTML = content;
+        document.getElementById("resultTab").style.display = "flex";
+    }
+    
+    function closeResult(){ 
+        document.getElementById("resultTab").style.display = "none"; 
+    }
+
     function parseInput(id){
-        let v=document.getElementById(id).value.replace(/,/g,'');
+        let v = document.getElementById(id).value.replace(/,/g,'');
         return Number(v)||0;
     }
+    
     function formatInput(input){
-        let v=input.value.replace(/[^0-9]/g,'');
-        if(v===""){ input.value=""; return; }
-        input.value=Number(v).toLocaleString();
+        let v = input.value.replace(/[^0-9]/g,'');
+        if(v === ""){ input.value = ""; return; }
+        input.value = Number(v).toLocaleString();
     }
-    document.querySelectorAll("input").forEach(i=>{
-        i.addEventListener("input",()=> { if(i.type !== 'number' && i.type !== 'checkbox') formatInput(i); });
+    
+    document.querySelectorAll(".tool-input, .troop-box input").forEach(i => {
+        i.addEventListener("input", () => { if(i.type !== 'number' && i.type !== 'checkbox') formatInput(i); });
     });
+    
     function clearInputs(toolId){
-        document.querySelectorAll("#"+toolId+" input").forEach(i=>{ 
+        document.querySelectorAll("#" + toolId + " input").forEach(i => { 
             if(i.type === 'checkbox') i.checked = false;
-            else i.value=""; 
+            else i.value = ""; 
         });
         if(toolId === 'troopTool') updateLiveStats();
     }
 
-    /* CALCULATIONS (UNCHANGED) */
+    // ==========================================
+    // 2. SPEED UP & GEM CALCULATORS
+    // ==========================================
     function calculateSpeed(){
-        let multiplier=document.getElementById("speedEvent").value;
-        let totalMinutes = parseInput("d1")*1+parseInput("d5")*5+parseInput("d10")*10+parseInput("d15")*15+parseInput("d30")*30+
-                           parseInput("h1")*60+parseInput("h3")*180+parseInput("h8")*480+parseInput("h15")*900+parseInput("h24")*1440+
-                           parseInput("d3")*4320+parseInput("d7")*10080+parseInput("d14")*20160+parseInput("d30s")*43200;
+        let multiplier = document.getElementById("speedEvent").value;
+        let totalMinutes = parseInput("d1")*1 + parseInput("d5")*5 + parseInput("d10")*10 + parseInput("d15")*15 + parseInput("d30")*30 +
+                           parseInput("h1")*60 + parseInput("h3")*180 + parseInput("h8")*480 + parseInput("h15")*900 + parseInput("h24")*1440 +
+                           parseInput("d3")*4320 + parseInput("d7")*10080 + parseInput("d14")*20160 + parseInput("d30s")*43200;
         totalMinutes *= multiplier;
-        let days=Math.floor(totalMinutes/1440), hours=Math.floor((totalMinutes%1440)/60), mins=Math.floor(totalMinutes%60);
-        showResult("<h3>Total Speed</h3><div class='precise-time'>"+days+"d "+hours+"h "+mins+"m</div>");
+        let days = Math.floor(totalMinutes/1440), hours = Math.floor((totalMinutes%1440)/60), mins = Math.floor(totalMinutes%60);
+        showResult("<h3>Total Speed</h3><div class='precise-time'>" + days + "d " + hours + "h " + mins + "m</div>");
     }
 
     function calculateGems(){
         let colo=parseInput("colo"), guild=parseInput("guild"), monster=parseInput("monster"), ev=parseInput("eventgems"), tr=parseInput("treasure"), ba=parseInput("basic"), bo=parseInput("bonus");
         let rColo=Math.floor(colo*8*30), rGuild=Math.floor(guild*30), rMonster=Math.floor(monster*15), rEvent=Math.floor(ev*3), rTreasure=Math.floor(tr*(100+ba+bo)/100);
-        let total=rColo+rGuild+rMonster+rEvent+rTreasure;
+        let total = rColo + rGuild + rMonster + rEvent + rTreasure;
         showResult("<h3>30-Day Forecast</h3><div class='resultGrid'><div>Colosseum</div><span>"+rColo.toLocaleString()+"</span><div>Guild</div><span>"+rGuild.toLocaleString()+"</span><div>Monster</div><span>"+rMonster.toLocaleString()+"</span><div>Event</div><span>"+rEvent.toLocaleString()+"</span><div>Treasure</div><span>"+rTreasure.toLocaleString()+"</span></div><div class='totalRow'><div>TOTAL GEMS</div><span>"+total.toLocaleString()+"</span></div>");
     }
 
-    /* TROOP CONFIG & GENERATION */
+    // ==========================================
+    // 3. TROOP CALCULATOR
+    // ==========================================
     const ICONS = {
         army: "Picsart_26-03-19_23-38-15-683.png", might: "Picsart_26-03-17_22-24-27-109.png",
         food: "Picsart_26-03-17_22-31-19-118.png", stone: "Picsart_26-03-17_22-31-37-917.png",
         wood: "Picsart_26-03-17_22-31-57-627.png", ore: "Picsart_26-03-17_22-32-16-895.png", gold: "Picsart_26-03-17_22-32-37-505.png"
     };
-
-    const tiers = [1,2,3,4], types = ["Inf", "Ran", "Cav", "Siege"];
+    const tiers = [1,2,3,4], types = ["Infantry", "Range", "Cavalry", "Siege"];
     const mPwr = {1:2, 2:8, 3:24, 4:36}, tBase = {1:15, 2:30, 3:60, 4:120};
     const rBase = {
         1: {f:50, w:50, s:0, o:50, g:0}, 2: {f:100, w:100, s:100, o:0, g:5},
@@ -282,7 +376,7 @@
         let d = Math.floor(sT/86400), h = Math.floor((sT%86400)/3600), m = Math.floor((sT%3600)/60), s = sT%60;
         const line = (key, label, val) => `<div><img src="${ICONS[key]}" class="game-icon" onerror="this.style.display='none'"> ${label}</div><span>${formatAbbr(val)}</span>`;
         
-        let content = `<h3>Requirements</h3><div class='precise-time'>${d}d ${h}h ${m}m ${s}s</div><div class='resultGrid'>` +
+        let content = `<h3>Precise Speeds Up Needed</h3><div class='precise-time'>${d}d ${h}h ${m}m ${s}s</div><div class='resultGrid'>` +
             line('army', 'Army', r.a) + line('might', 'Might', r.m) + line('food', 'Food', r.f) + 
             line('wood', 'Wood', r.w) + line('stone', 'Stone', r.s) + line('ore', 'Ore', r.o) + line('gold', 'Gold', r.g) +
             `</div><div class='totalRow'><div>EST. DAYS</div><span>${sT > 0 ? d+1 : 0} Days</span></div>`;
@@ -293,7 +387,7 @@
     const tierContainer = document.getElementById('tier-container');
     tiers.forEach(t => {
         let row = document.createElement('div'); row.className = 'tier-row';
-        row.innerHTML = `<div class="tier-header">UNIT TIER ${t}</div><div class="tier-grid"></div>`;
+        row.innerHTML = `<div class="tier-header">TIER ${t}</div><div class="tier-grid"></div>`;
         types.forEach(ty => {
             let box = document.createElement('div'); box.className = 'troop-box';
             box.innerHTML = `<label>${ty.toUpperCase()}</label><input type="text" id="t${t}${ty}" data-t="${t}" placeholder="0">`;
@@ -307,9 +401,330 @@
         tierContainer.appendChild(row);
     });
 
-    // Set initial icons if they exist
     document.getElementById('h-army').src = ICONS.army;
     document.getElementById('h-might').src = ICONS.might;
+
+    // ==========================================
+    // 4. GEAR SIMULATOR 
+    // ==========================================
+    
+    // Dynamic Image Generator for cleaner code
+    function getImg(name) {
+        return `https://placehold.co/100/2d3554/white?text=${encodeURIComponent(name.split(' ')[0])}`;
+    }
+
+    // --- Master Data ---
+    const GEAR_DATA = {
+      Legs: [
+        {name:"Champion Boots", lvl: 60, stats:{"Range ATK": 56, "Army ATK": 14, "Army HP": 30.8, "Travel Speed": 70}},
+        {name:"Champion Greaves", lvl: 60, stats:{"Cavalry ATK": 56, "Army ATK": 14, "Army HP": 30.8, "Travel Speed": 70}},
+        {name:"Champion Stride", lvl: 60, stats:{"Infantry ATK": 56, "Army ATK": 14, "Army HP": 30.8, "Travel Speed": 70}},
+        {name:"Blizzard Pants", lvl: 60, stats:{"Range ATK": 42, "Cavalry ATK": 42, "Army DEF": 14, "Army Max HP": 16.8}},
+        {name:"Storm Tasset", lvl: 60, stats:{"Infantry ATK": 42, "Cavalry ATK": 42, "Army DEF": 28, "Army Max HP": 14}},
+        {name:"Dragon Talon", lvl: 60, stats:{"Infantry ATK": 28, "Range ATK": 42, "Army Max HP": 21}},
+        {name:"Gargantua Belt", lvl: 60, stats:{"Cavalry ATK": 52.5, "Cavalry Max HP": 38.5, "Army DEF": 21, "Stone Production Rate": 70}},
+        {name:"Untamed Boots", lvl: 55, stats:{"Cavalry ATK": 28, "Cavalry DEF": 21, "Army Max HP": 21, "Travel Speed": 42}},
+        {name:"Legs of the Deceiver", lvl: 55, stats:{"Range ATK": 7, "Range DEF": 21, "Army ATK": 16.8}},
+        {name:"Beastly Waist Guard", lvl: 50, stats:{"Cavalry ATK": 22.4, "Cavalry Max HP": 16.8, "Army DEF": 16.8}},
+        {name:"Steps of Reckoning", lvl: 50, stats:{"Infantry ATK": 22.4, "Infantry DEF": 16.8, "Infantry Max HP": 11.2}},
+        {name:"Stealthy Steps", lvl: 50, stats:{"Range ATK": 22.4, "Range DEF": 28, "Army Max HP": 11.2}}
+      ],
+      Armor: [
+        {name:"Champion Plate", lvl: 60, stats:{"Range ATK": 56, "Army DEF": 59.5, "Army Max HP": 35, "Reduce Upkeep": 72.8}},
+        {name:"Terror Shield", lvl: 60, stats:{"Infantry ATK": 49, "Infantry Max HP": 35, "Army Max HP": 29, "Research Speed": 11.2}},
+        {name:"Firewall Plate", lvl: 60, stats:{"Infantry ATK": 28, "Cavalry ATK": 42, "Siege Engine ATK": 42, "Army Max HP": 21}},
+        {name:"Champion Mail", lvl: 60, stats:{"Infantry ATK": 42, "Army ATK": 14, "Army DEF": 49, "Army Max HP": 21, "Reduce Upkeep": 72.8}},
+        {name:"Champion Cuirass", lvl: 60, stats:{"Cavalry ATK": 42, "Army ATK": 14, "Army DEF": 49, "Army Max HP": 21, "Reduce Upkeep": 72.8}},
+        {name:"Beastly Breastplate", lvl: 60, stats:{"Range ATK": 49, "Range Max HP": 21, "Army DEF": 28}},
+        {name:"Hardened Carapace", lvl: 55, stats:{"Range ATK": 35, "Cavalry ATK": 35, "Army DEF": 14}},
+        {name:"Hedonic Cuirass", lvl: 55, stats:{"Infantry ATK": 35, "Range ATK": 35, "Infantry Max HP": 42}},
+        {name:"Frostwing Armor", lvl: 50, stats:{"Infantry ATK": 11.2, "Range ATK": 11.2, "Siege Engine ATK": 17.5}},
+        {name:"Winter Parka", lvl: 50, stats:{"Infantry ATK": 17.5, "Cavalry DEF": 35, "Army Max HP": 21}},
+        {name:"Deadly Mantle", lvl: 50, stats:{"Range ATK": 28, "Trap ATK": 28, "Army DEF": 21}},
+        {name:"Predator Pauldrons", lvl: 50, stats:{"Cavalry ATK": 14, "Cavalry Max HP": 28, "Army DEF": 21, "Travel Speed": 35}}
+      ],
+      Helmet: [
+        {name:"Champion Helm", lvl: 60, stats:{"Cavalry ATK": 49, "Army ATK": 14, "Army Max HP": 49, "Gold Production Rate": 105}},
+        {name:"Wyrmbone Coronet", lvl: 60, stats:{"Range ATK": 45.5, "Range DEF": 28, "Army Max HP": 17.5, "Research Speed": 14}},
+        {name:"Beast Helm", lvl: 60, stats:{"Infantry ATK": 42, "Cavalry ATK": 35, "Army Max HP": 21, "Travel Speed": 45}},
+        {name:"Bubble Helm", lvl: 60, stats:{"Range ATK": 42, "Cavalry ATK": 42, "Army Max HP": 28}},
+        {name:"Champion Visor", lvl: 60, stats:{"Infantry ATK": 35, "Range ATK": 35, "Army ATK": 14, "Army Max HP": 28, "Gold Production Rate": 105}},
+        {name:"Champion Armet", lvl: 60, stats:{"Range ATK": 35, "Cavalry ATK": 35, "Army ATK": 14, "Army Max HP": 28, "Gold Production Rate": 105}},
+        {name:"Serpent Helm", lvl: 60, stats:{"Infantry ATK": 42, "Range ATK": 42, "Infantry Max HP": 21, "Army DEF": 35}},
+        {name:"Ancient Hat", lvl: 55, stats:{"Range ATK": 39.2, "Range DEF": 35, "Army DEF": 21}},
+        {name:"Frostwing Helm", lvl: 50, stats:{"Range ATK": 12.6, "Siege Engine ATK": 10.5, "Army Max HP": 16.1}},
+        {name:"Shadow Helm", lvl: 50, stats:{"Infantry ATK": 14, "Trap ATK": 42, "Trap DEF": 42, "Wall DEF Boost": 21}},
+        {name:"Devourer Helm", lvl: 50, stats:{"Infantry ATK": 18.2, "Cavalry ATK": 18.2, "Cavalry DEF": 14, "Infantry Max HP": 7}},
+        {name:"Orca Mask", lvl: 50, stats:{"Range ATK": 18.2, "Cavalry ATK": 18.2, "Range DEF": 9.8, "Cavalry Max HP": 11.2}}
+      ],
+      "Main-Hand": [
+        {name:"Champion Blade", lvl: 60, stats:{"Infantry ATK": 28, "Range ATK": 28, "Army ATK": 21, "Army DEF": 23.8, "Research Speed": 21}},
+        {name:"Champion GreatSword", lvl: 60, stats:{"Range ATK": 28, "Cavalry ATK": 28, "Army ATK": 21, "Army DEF": 23.8, "Research Speed": 21}},
+        {name:"Champion Blade (Cav)", lvl: 60, stats:{"Cavalry ATK": 49, "Army ATK": 21, "Army DEF": 23.8, "Research Speed": 21}},
+        {name:"Frostwing Sword", lvl: 60, stats:{"Infantry ATK": 28, "Cavalry ATK": 28, "Range ATK": 17.5}},
+        {name:"Skull Crasher", lvl: 60, stats:{"Range ATK": 21, "Infantry DEF": 35, "Army ATK": 28}},
+        {name:"Ghostly Cane", lvl: 60, stats:{"Infantry ATK": 45.5, "Infantry Max HP": 14, "Army DEF": 14}},
+        {name:"Eon Axe", lvl: 60, stats:{"Cavalry ATK": 52.5, "Cavalry DEF": 14, "Cavalry Max HP": 14}},
+        {name:"Terror Slash", lvl: 55, stats:{"Infantry ATK": 38.5, "Infantry DEF": 14, "Army Capacity": 28, "Construction Speed": 14}},
+        {name:"Horn Cudgel", lvl: 55, stats:{"Cavalry ATK": 42, "Cavalry DEF": 21, "Trap DEF": 49}},
+        {name:"Decadent Sword", lvl: 55, stats:{"Infantry ATK": 35, "Range ATK": 35, "Range DEF": 14, "Infantry Max HP": 14}},
+        {name:"Nectar Orb", lvl: 55, stats:{"Cavalry ATK": 35, "Range ATK": 35, "Cavalry DEF": 14, "Range Max HP": 14}},
+        {name:"Kraken's Anchor", lvl: 55, stats:{"Infantry ATK": 35, "Cavalry ATK": 35, "Infantry DEF": 18.2, "Cavalry Max HP": 18.2}},
+        {name:"Wyrm Rod", lvl: 50, stats:{"Range ATK": 35, "Range Max HP": 24.5, "Timber Production Rate": 70}},
+        {name:"Malicious Saw", lvl: 50, stats:{"Infantry ATK": 35, "Siege Engine ATK": 35, "Infantry DEF": 21, "Siege Engine DEF": 35}}
+      ],
+      "Off-Hand": [
+        {name:"Champion Katar", lvl: 60, stats:{"Range ATK": 49, "Cavalry ATK": 42, "Army DEF": 28, "Training Speed": 14}},
+        {name:"Champion Light", lvl: 60, stats:{"Infantry ATK": 49, "Cavalry ATK": 42, "Army DEF": 28, "Training Speed": 14}},
+        {name:"Champion Lamp", lvl: 60, stats:{"Infantry ATK": 49, "Range ATK": 42, "Army DEF": 28, "Training Speed": 14}},
+        {name:"Winter Mitts", lvl: 60, stats:{"Range ATK": 14, "Infantry DEF": 45.5, "Army DEF": 35, "Army Max HP": 35}},
+        {name:"Eternal Codex", lvl: 60, stats:{"Cavalry ATK": 28, "Range ATK": 49, "Cavalry Max HP": 28}},
+        {name:"Lunar Boomerang", lvl: 60, stats:{"Cavalry ATK": 42, "Cavalry DEF": 21, "Cavalry Max HP": 21}},
+        {name:"Eerie Lantern", lvl: 60, stats:{"Infantry ATK": 42, "Infantry DEF": 14, "Infantry Max HP": 14}},
+        {name:"Spirit Axe", lvl: 60, stats:{"Infantry ATK": 35, "Cavalry ATK": 35, "Cavalry Max HP": 14, "Army DEF": 14}},
+        {name:"Venom Blade", lvl: 60, stats:{"Infantry ATK": 35, "Range ATK": 35, "Range DEF": 14, "Army Max HP": 14}},
+        {name:"Dark Aegis", lvl: 50, stats:{"Infantry ATK": 14, "Army ATK": 14}},
+        {name:"Dragon Fist", lvl: 50, stats:{"Cavalry ATK": 30.8, "Army Max HP": 28}},
+        {name:"Viral SwitchBlade", lvl: 50, stats:{"Infantry ATK": 21, "Range ATK": 21, "Siege Engine ATK": 35, "Siege Engine DEF": 28}},
+        {name:"Call of the Deep", lvl: 50, stats:{"Infantry ATK": 21, "Cavalry ATK": 21, "Infantry Max HP": 14, "Cavalry Max HP": 14}}
+      ],
+      Accessory: [
+        {name:"Champion Faith", lvl: 60, stats:{"Infantry ATK": 21, "Cavalry ATK": 21, "Army ATK": 14, "Army Max HP": 35}},
+        {name:"Ambrosial Cup", lvl: 60, stats:{"Infantry ATK": 35, "Range ATK": 35, "Infantry Max HP": 21, "Range Max HP": 21}},
+        {name:"Champion Valor", lvl: 60, stats:{"Cavalry ATK": 21, "Range ATK": 21, "Army ATK": 14, "Army Max HP": 35}},
+        {name:"Champion Blessing", lvl: 60, stats:{"Infantry ATK": 21, "Range ATK": 21, "Army ATK": 14, "Army Max HP": 35}},
+        {name:"Rowdy Resolve", lvl: 60, stats:{"Cavalry ATK": 35, "Cavalry DEF": 10.5, "Cavalry Max HP": 14}},
+        {name:"Book of the Dead", lvl: 60, stats:{"Infantry ATK": 35, "Cavalry ATK": 35, "Cavalry DEF": 28, "Infantry Max HP": 21}},
+        {name:"Polar Ring", lvl: 60, stats:{"Cavalry ATK": 35, "Range ATK": 35, "Cavalry Max HP": 21, "Range Max HP": 21}},
+        {name:"Frostwing's Breath", lvl: 55, stats:{"Infantry ATK": 11.2, "Cavalry ATK": 11.2, "Gold Production Rate": 70}},
+        {name:"Burning Scroll", lvl: 55, stats:{"Army ATK": 12.6, "Army Max HP": 12.6, "Timber Production Rate": 49}},
+        {name:"Dragon's Iris", lvl: 55, stats:{"Cavalry ATK": 14, "Range ATK": 14, "Army Max HP": 14}},
+        {name:"Terror Vial", lvl: 50, stats:{"Infantry ATK": 22.4, "Infantry Max HP": 7, "Army DEF": 11.2, "Ore Production Rate": 49}},
+        {name:"Fear Drum", lvl: 50, stats:{"Cavalry ATK": 22.4, "Siege Engine ATK": 14, "Cavalry Max HP": 7.7, "Gold Production Rate": 49}}
+      ]
+    };
+
+    const JEWEL_DATA = [
+      {name:"Infantry ATK", stat:"Infantry ATK", value: 20},
+      {name:"Range ATK", stat:"Range ATK", value: 20},
+      {name:"Cavalry ATK", stat:"Cavalry ATK", value: 20}
+    ];
+
+    const SLOT_CONFIG = ["Legs", "Armor", "Helmet", "Main-Hand", "Off-Hand", "Accessory1", "Accessory2", "Accessory3"];
+
+    // --- State ---
+    let activeSetIdx = 0;
+    let sets = [Array(8).fill(null), Array(8).fill(null), Array(8).fill(null)];
+    
+    // Sort logic
+    let gearSortDesc = true; 
+    let currentOpenSlot = null;
+
+    // --- Logic ---
+    function switchSet(idx) {
+      activeSetIdx = idx;
+      document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
+      render();
+    }
+
+    function resetEntireSet() {
+      if(confirm("Are you sure you want to clear ALL gear in this set?")) {
+        sets[activeSetIdx] = Array(8).fill(null);
+        render();
+      }
+    }
+
+    function clearSingleSlot(idx) {
+      sets[activeSetIdx][idx] = null;
+      render();
+    }
+    
+    function toggleGearSort() {
+      gearSortDesc = !gearSortDesc;
+      if(currentOpenSlot !== null) {
+          openGearSelection(currentOpenSlot);
+      }
+    }
+
+    function openGearSelection(slotIdx) {
+      currentOpenSlot = slotIdx;
+      const type = SLOT_CONFIG[slotIdx].replace(/\d/g, ''); 
+      const list = GEAR_DATA[type] || [];
+      
+      const body = document.getElementById('modalBody');
+      document.getElementById('modalTitle').textContent = `Select ${type}`;
+      
+      let sortedList = list.map((gear, origIdx) => ({...gear, origIdx}))
+                           .sort((a,b) => gearSortDesc ? b.lvl - a.lvl : a.lvl - b.lvl);
+      
+      // Formatting strictly to: Name, Level, Stats stacked visually
+      body.innerHTML = sortedList.map(item => {
+        let statsHtml = Object.entries(item.stats)
+            .map(([k,v]) => `${k}: ${v}%`)
+            .join('<br>');
+            
+        return `
+        <div class="card" onclick="selectGear(${slotIdx}, '${type}', ${item.origIdx})" style="align-items: flex-start;">
+          <img src="${item.img || getImg(item.name)}">
+          <div style="width: 100%;">
+            <div style="font-weight: bold; color: #a4b1f9; font-size: 16px;">${item.name}</div>
+            <div style="color: #fff; font-size: 12px; margin-bottom: 5px;">Level ${item.lvl || 60}</div>
+            <div style="color: #ddd; font-size: 13px; line-height: 1.4;">
+              ${statsHtml}
+            </div>
+          </div>
+        </div>
+      `}).join('');
+      
+      document.getElementById('mainModal').classList.add('open');
+    }
+
+    function selectGear(slotIdx, type, dataIdx) {
+      const gear = JSON.parse(JSON.stringify(GEAR_DATA[type][dataIdx]));
+      gear.jewels = [null, null, null];
+      sets[activeSetIdx][slotIdx] = gear;
+      closeModal();
+      render();
+    }
+
+    function openJewelMenu(slotIdx) {
+      const gear = sets[activeSetIdx][slotIdx];
+      const body = document.getElementById('modalBody');
+      document.getElementById('modalTitle').textContent = "Manage Jewels";
+      
+      let html = `<div class="preview-area" style="display:flex; align-items:center; gap:15px;">
+                    <img src="${gear.img || getImg(gear.name)}" style="width:45px; height:45px; border-radius:6px; border:1px solid rgba(255,255,255,0.1);">
+                    <div><strong>${gear.name}</strong><br><span style="font-size:12px; color:var(--muted)">Select a socket to edit.</span></div>
+                  </div>`;
+                  
+      html += `<div class="jewel-grid">`;
+      gear.jewels.forEach((j, i) => {
+        html += `<div class="socket" style="padding:15px 5px; background:${j ? '#2a325a' : '#242b4d'}; border-color:${j ? '#7c9cff' : 'rgba(255,255,255,0.08)'}" onclick="chooseJewelForSlot(${slotIdx}, ${i})">
+                    <div style="font-size:18px; margin-bottom:5px; color:${j ? '#7c9cff' : '#555'}">♦</div>
+                    ${j ? j.name : 'Empty'}
+                 </div>`;
+      });
+      html += `</div>`;
+      
+      // Added Clear All Jewels button here per your request
+      html += `<div style="margin-top: 20px;">
+                 <button class="btn btn-clear" style="padding: 10px;" onclick="clearAllJewels(${slotIdx})">Clear All Jewels</button>
+               </div>`;
+      
+      body.innerHTML = html;
+      document.getElementById('mainModal').classList.add('open');
+    }
+
+    function clearAllJewels(slotIdx) {
+      if(sets[activeSetIdx][slotIdx]) {
+        sets[activeSetIdx][slotIdx].jewels = [null, null, null];
+        render();
+        openJewelMenu(slotIdx); // Refresh the menu instantly
+      }
+    }
+
+    function chooseJewelForSlot(slotIdx, jewelIdx) {
+      const body = document.getElementById('modalBody');
+      
+      body.innerHTML = `
+        <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+            <button class="btn" style="background: #3d4670;" onclick="openJewelMenu(${slotIdx})">← Back</button>
+            <button class="btn btn-clear" onclick="applyJewel(${slotIdx}, ${jewelIdx}, -1)">Remove This Jewel</button>
+        </div>
+      `;
+      body.innerHTML += JEWEL_DATA.map((j, i) => `
+        <div class="card" onclick="applyJewel(${slotIdx}, ${jewelIdx}, ${i})">
+          <div><strong>${j.name}</strong> (+${j.value}%)</div>
+        </div>
+      `).join('');
+    }
+
+    function applyJewel(slotIdx, jewelIdx, dataIdx) {
+      sets[activeSetIdx][slotIdx].jewels[jewelIdx] = dataIdx === -1 ? null : JEWEL_DATA[dataIdx];
+      render(); 
+      openJewelMenu(slotIdx);
+    }
+
+    function closeModal() { 
+        document.getElementById('mainModal').classList.remove('open'); 
+        currentOpenSlot = null;
+    }
+    
+    // Categorization Logic Helper
+    function isEconomyStat(stat) {
+        return /Speed|Production|Upkeep|Capacity/i.test(stat);
+    }
+
+    function render() {
+      const strTotals = {};
+      const ecoTotals = {};
+      
+      sets[activeSetIdx].forEach(item => {
+        if(!item) return;
+        Object.entries(item.stats).forEach(([k,v]) => {
+            if(isEconomyStat(k)) ecoTotals[k] = (ecoTotals[k]||0) + v;
+            else strTotals[k] = (strTotals[k]||0) + v;
+        });
+        item.jewels.forEach(j => { 
+            if(j) {
+                if(isEconomyStat(j.stat)) ecoTotals[j.stat] = (ecoTotals[j.stat]||0) + j.value;
+                else strTotals[j.stat] = (strTotals[j.stat]||0) + j.value;
+            }
+        });
+      });
+
+      const statsBox = document.getElementById('statsDisplay');
+      
+      const strHtml = Object.keys(strTotals).length ? Object.entries(strTotals).map(([k,v]) => `
+        <div class="stat-row"><span>${k}</span><strong>${v.toFixed(2).replace(/\.00$/, '')}%</strong></div>
+      `).join('') : '<div style="color:var(--muted); text-align:center; font-size:12px; margin-top:10px;">No Strength Stats</div>';
+      
+      const ecoHtml = Object.keys(ecoTotals).length ? Object.entries(ecoTotals).map(([k,v]) => `
+        <div class="stat-row"><span>${k}</span><strong>${v.toFixed(2).replace(/\.00$/, '')}%</strong></div>
+      `).join('') : '<div style="color:var(--muted); text-align:center; font-size:12px; margin-top:10px;">No Economy Stats</div>';
+      
+      statsBox.innerHTML = `
+        <div class="stat-col">
+            <div class="stat-header">⚔️ Strength</div>
+            ${strHtml}
+        </div>
+        <div class="stat-col-divider"></div>
+        <div class="stat-col">
+            <div class="stat-header">🛡️ Economy</div>
+            ${ecoHtml}
+        </div>
+      `;
+
+      // Render Rigid Slots
+      const grid = document.getElementById('slotsGrid');
+      grid.innerHTML = SLOT_CONFIG.map((label, i) => {
+        const item = sets[activeSetIdx][i];
+        return `
+          <div class="slot">
+            <div class="slot-label">${label}</div>
+            
+            ${item ? `
+              <div class="img-box" onclick="openGearSelection(${i})" style="cursor:pointer;" title="Click to change gear">
+                <img src="${item.img || getImg(item.name)}">
+              </div>
+              <div class="actions-group">
+                <button class="btn" onclick="openJewelMenu(${i})">Jewels</button>
+                <button class="btn btn-clear" onclick="clearSingleSlot(${i})">Clear</button>
+              </div>
+            ` : `
+              <div class="img-box empty-box" onclick="openGearSelection(${i})" title="Click to add gear">
+                <div class="btn-plus">+</div>
+              </div>
+              <div class="actions-group">
+                </div>
+            `}
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Init Gear
+    render();
 </script>
 </body>
 </html>
