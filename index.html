@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,10 +37,16 @@
     .input-group input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 0; }
     .input-group input[type="checkbox"] { width: 20px; height: 20px; margin: 8px 0; cursor: pointer; }
     .tier-row { border-bottom: 1px solid #eee; padding: 15px 0; }
-    .tier-header { font-weight: 800; color: #007bff; margin-bottom: 10px; font-size: 14px; text-align: left; }
+    
+    /* UPDATED: Tier Labels Centered */
+    .tier-header { font-weight: 800; color: #007bff; margin-bottom: 10px; font-size: 14px; text-align: center; } 
+    
     .tier-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .troop-box input { width: 100%; padding: 8px 4px; margin: 0; font-size: 13px; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
     .troop-box label { display: block; font-size: 10px; font-weight: bold; color: #888; text-align: center; margin-bottom: 3px; }
+    
+    /* NEW: Image Box styling for troops */
+    .troop-img { width: 35px; height: 35px; object-fit: cover; border-radius: 4px; background: #eaeaea; display: block; margin: 0 auto 5px auto; border: 1px solid #ddd; }
 
     /* Result Overlay (Toolkit) */
     .resultTab { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
@@ -198,10 +205,14 @@
             <div class="stat-item"><img id="h-might" class="game-icon"> <span id="live-m">0</span></div>
         </div>
         <div class="settings-grid">
-            <div class="input-group"><label>Training Speed %</label><input type="number" id="tSpeed" placeholder="475.05"></div>
-            <div class="input-group"><label>T1/T2 Sub %</label><input type="number" id="s12" placeholder="40"></div>
-            <div class="input-group"><label>T3/T4 Sub %</label><input type="number" id="s34" placeholder="30"></div>
-            <div class="input-group"><label>120% Event</label><input type="checkbox" id="troopEvent"></div>
+            <div class="input-group"><label>Training Speed %</label><input type="number" id="tSpeed" placeholder="0"></div>
+            <div class="input-group"><label>T1/T2 Sub %</label><input type="number" id="s12" placeholder="0"></div>
+            <div class="input-group"><label>T3/T4 Sub %</label><input type="number" id="s34" placeholder="0"></div>
+            
+            <div class="input-group" style="align-items: center;">
+                <label>120% Event</label>
+                <input type="checkbox" id="troopEvent" style="margin: 8px auto;">
+            </div>
         </div>
         <div id="tier-container"></div>
         <button class="menu-btn" onclick="calculateTroops()" style="background:#28a745; max-width:100%;">CALCULATE RESOURCES</button>
@@ -354,7 +365,7 @@
     }
 
     function calculateTroops() {
-        const spd = parseFloat(document.getElementById('tSpeed').value) || 475.05;
+        const spd = parseFloat(document.getElementById('tSpeed').value) || 0;
         const s12 = (parseFloat(document.getElementById('s12').value) || 0)/100;
         const s34 = (parseFloat(document.getElementById('s34').value) || 0)/100;
         const mult = (1 + (spd/100)) * (document.getElementById('troopEvent').checked ? 1.2 : 1);
@@ -390,7 +401,13 @@
         row.innerHTML = `<div class="tier-header">TIER ${t}</div><div class="tier-grid"></div>`;
         types.forEach(ty => {
             let box = document.createElement('div'); box.className = 'troop-box';
-            box.innerHTML = `<label>${ty.toUpperCase()}</label><input type="text" id="t${t}${ty}" data-t="${t}" placeholder="0">`;
+            
+            box.innerHTML = `
+                <img src="images/t${t}_${ty.toLowerCase()}.png" class="troop-img" alt="T${t} ${ty}" onerror="this.style.display='none'">
+                <label>${ty.toUpperCase()}</label>
+                <input type="text" id="t${t}${ty}" data-t="${t}" placeholder="0">
+            `;
+            
             box.querySelector('input').addEventListener('input', (e) => {
                 let v = e.target.value.replace(/\D/g,'');
                 e.target.value = v ? Number(v).toLocaleString() : '';
@@ -500,14 +517,38 @@
         {name:"Burning Scroll", lvl: 55, stats:{"Army ATK": 12.6, "Army Max HP": 12.6, "Timber Production Rate": 49}},
         {name:"Dragon's Iris", lvl: 55, stats:{"Cavalry ATK": 14, "Range ATK": 14, "Army Max HP": 14}},
         {name:"Terror Vial", lvl: 50, stats:{"Infantry ATK": 22.4, "Infantry Max HP": 7, "Army DEF": 11.2, "Ore Production Rate": 49}},
-        {name:"Fear Drum", lvl: 50, stats:{"Cavalry ATK": 22.4, "Siege Engine ATK": 14, "Cavalry Max HP": 7.7, "Gold Production Rate": 49}}
+        {name:"Fear Drum", lvl: 50, stats:{"Cavalry ATK": 22.4, "Siege Engine ATK": 14, "Cavalry Max HP": 7.7, "Gold Production Rate": 49}},
+        {name:"Blight Ring", lvl: 60, stats:{"Range ATK": 19.6, "Army DEF": 21, "Army Max HP": 21, "Wall DEF Boost": 35}},
+        {name:"Wyrm Seal", lvl: 55, stats:{"Range ATK": 22.4, "Siege Engine ATK": 21, "Army Max HP": 11.2, "Stone Production Rate": 49}},
+        {name:"Coil Armband", lvl: 50, stats:{"Infantry ATK": 18.2, "Range ATK": 18.2, "Infantry DEF": 14, "Range Max HP": 11.2}}
       ]
     };
 
+    // UPDATED JEWEL DATA STRUCTURE
     const JEWEL_DATA = [
-      {name:"Infantry ATK", stat:"Infantry ATK", value: 20},
-      {name:"Range ATK", stat:"Range ATK", value: 20},
-      {name:"Cavalry ATK", stat:"Cavalry ATK", value: 20}
+      { name: "Infantry ATK", stats: { "Infantry ATK": 20 } },
+      { name: "Range ATK", stats: { "Range ATK": 20 } },
+      { name: "Cavalry ATK", stats: { "Cavalry ATK": 20 } },
+      { name: "Terror", stats: { "Infantry ATK": 10, "Infantry DEF": 10 } },
+      { name: "Wyrm", stats: { "Range ATK": 10, "Range DEF": 10 } },
+      { name: "Gargantua", stats: { "Cavalry ATK": 10, "Cavalry DEF": 10 } },
+      { name: "Trojan", stats: { "Infantry Max HP": 15, "Travel Speed": 5 } },
+      { name: "Grim", stats: { "Range Max HP": 15, "Travel Speed": 5 } },
+      { name: "Saber", stats: { "Cavalry Max HP": 15, "Travel Speed": 5 } },
+      { name: "Infantry DEF", stats: { "Infantry DEF": 20 } },
+      { name: "Range DEF", stats: { "Range DEF": 20 } },
+      { name: "Cavalry DEF", stats: { "Cavalry DEF": 20 } },
+      { name: "Army Assault", stats: { "Army ATK": 10 } },
+      { name: "IC Assault", stats: { "Infantry ATK": 10, "Cavalry ATK": 5 } },
+      { name: "RI Assault", stats: { "Range ATK": 10, "Infantry ATK": 5 } },
+      { name: "CI Assault", stats: { "Cavalry ATK": 10, "Range ATK": 5 } },
+      { name: "Royal Infantry", stats: { "Infantry ATK": 10, "Infantry Max HP": 10 } },
+      { name: "Royal Range", stats: { "Range ATK": 10, "Range Max HP": 10 } },
+      { name: "Royal Cavalry", stats: { "Cavalry ATK": 10, "Cavalry Max HP": 10 } },
+      { name: "Falcon", stats: { "Infantry ATK": 15, "Range ATK": 15 } },
+      { name: "Dragon Infantry", stats: { "Infantry ATK": 15 } },
+      { name: "Dragon Range", stats: { "Range ATK": 15 } },
+      { name: "Dragon Cavalry", stats: { "Cavalry ATK": 15 } }
     ];
 
     const SLOT_CONFIG = ["Legs", "Armor", "Helmet", "Main-Hand", "Off-Hand", "Accessory1", "Accessory2", "Accessory3"];
@@ -557,7 +598,6 @@
       let sortedList = list.map((gear, origIdx) => ({...gear, origIdx}))
                            .sort((a,b) => gearSortDesc ? b.lvl - a.lvl : a.lvl - b.lvl);
       
-      // Formatting strictly to: Name, Level, Stats stacked visually
       body.innerHTML = sortedList.map(item => {
         let statsHtml = Object.entries(item.stats)
             .map(([k,v]) => `${k}: ${v}%`)
@@ -587,8 +627,22 @@
       render();
     }
 
+    // ================================
+    // JEWEL LOGIC (UPDATED)
+    // No duplicate jewel names in one gear
+    // ================================
+    function getEquippedJewelNames(slotIdx, excludeJewelIdx = null) {
+      const gear = sets[activeSetIdx][slotIdx];
+      if (!gear || !Array.isArray(gear.jewels)) return [];
+      return gear.jewels
+        .filter((j, idx) => j && idx !== excludeJewelIdx)
+        .map(j => j.name);
+    }
+
     function openJewelMenu(slotIdx) {
       const gear = sets[activeSetIdx][slotIdx];
+      if (!gear) return;
+
       const body = document.getElementById('modalBody');
       document.getElementById('modalTitle').textContent = "Manage Jewels";
       
@@ -606,7 +660,6 @@
       });
       html += `</div>`;
       
-      // Added Clear All Jewels button here per your request
       html += `<div style="margin-top: 20px;">
                  <button class="btn btn-clear" style="padding: 10px;" onclick="clearAllJewels(${slotIdx})">Clear All Jewels</button>
                </div>`;
@@ -619,28 +672,68 @@
       if(sets[activeSetIdx][slotIdx]) {
         sets[activeSetIdx][slotIdx].jewels = [null, null, null];
         render();
-        openJewelMenu(slotIdx); // Refresh the menu instantly
+        openJewelMenu(slotIdx);
       }
     }
 
     function chooseJewelForSlot(slotIdx, jewelIdx) {
+      const gear = sets[activeSetIdx][slotIdx];
+      if (!gear) return;
+
+      const usedNames = new Set(getEquippedJewelNames(slotIdx, jewelIdx));
+      const currentJewel = gear.jewels[jewelIdx];
+
       const body = document.getElementById('modalBody');
-      
+      document.getElementById('modalTitle').textContent = "Choose Jewel";
+
       body.innerHTML = `
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
             <button class="btn" style="background: #3d4670;" onclick="openJewelMenu(${slotIdx})">← Back</button>
             <button class="btn btn-clear" onclick="applyJewel(${slotIdx}, ${jewelIdx}, -1)">Remove This Jewel</button>
         </div>
-      `;
-      body.innerHTML += JEWEL_DATA.map((j, i) => `
-        <div class="card" onclick="applyJewel(${slotIdx}, ${jewelIdx}, ${i})">
-          <div><strong>${j.name}</strong> (+${j.value}%)</div>
+        <div class="preview-area" style="margin-bottom: 12px;">
+          Socket ${jewelIdx + 1}${currentJewel ? ` — current: <strong>${currentJewel.name}</strong>` : " — current: <strong>Empty</strong>"}
         </div>
-      `).join('');
+      `;
+
+      body.innerHTML += JEWEL_DATA.map((j, i) => {
+        const alreadyUsed = usedNames.has(j.name);
+        const isCurrent = currentJewel && currentJewel.name === j.name;
+
+        let statsStr = Object.entries(j.stats).map(([k,v]) => `${k} +${v}%`).join(', ');
+        return `
+        <div class="card" onclick="${alreadyUsed && !isCurrent ? '' : `applyJewel(${slotIdx}, ${jewelIdx}, ${i})`}" style="
+             opacity:${alreadyUsed && !isCurrent ? '0.45' : '1'};
+             cursor:${alreadyUsed && !isCurrent ? 'not-allowed' : 'pointer'};
+             border-color:${isCurrent ? '#7c9cff' : 'rgba(255,255,255,0.08)'};">
+          <div style="width: 100%;">
+             <strong>${j.name} Jewel${alreadyUsed && !isCurrent ? ' (Already used in this gear)' : ''}${isCurrent ? ' (Selected)' : ''}</strong>
+             <div style="font-size: 11px; color: #b6bddf; margin-top: 3px;">${statsStr}</div>
+          </div>
+        </div>
+      `}).join('');
     }
 
     function applyJewel(slotIdx, jewelIdx, dataIdx) {
-      sets[activeSetIdx][slotIdx].jewels[jewelIdx] = dataIdx === -1 ? null : JEWEL_DATA[dataIdx];
+      const gear = sets[activeSetIdx][slotIdx];
+      if (!gear) return;
+
+      if (dataIdx === -1) {
+        gear.jewels[jewelIdx] = null;
+        render();
+        openJewelMenu(slotIdx);
+        return;
+      }
+
+      const selected = JEWEL_DATA[dataIdx];
+      const usedNames = new Set(getEquippedJewelNames(slotIdx, jewelIdx));
+
+      if (usedNames.has(selected.name)) {
+        alert(`"${selected.name}" is already used in another socket on this gear.`);
+        return;
+      }
+
+      gear.jewels[jewelIdx] = JSON.parse(JSON.stringify(selected));
       render(); 
       openJewelMenu(slotIdx);
     }
@@ -655,20 +748,27 @@
         return /Speed|Production|Upkeep|Capacity/i.test(stat);
     }
 
+    // UPDATED TO READ FROM THE NEW JEWEL.STATS OBJECT
     function render() {
       const strTotals = {};
       const ecoTotals = {};
       
       sets[activeSetIdx].forEach(item => {
         if(!item) return;
+        
+        // Add Gear Stats
         Object.entries(item.stats).forEach(([k,v]) => {
             if(isEconomyStat(k)) ecoTotals[k] = (ecoTotals[k]||0) + v;
             else strTotals[k] = (strTotals[k]||0) + v;
         });
+        
+        // Add Jewel Stats
         item.jewels.forEach(j => { 
-            if(j) {
-                if(isEconomyStat(j.stat)) ecoTotals[j.stat] = (ecoTotals[j.stat]||0) + j.value;
-                else strTotals[j.stat] = (strTotals[j.stat]||0) + j.value;
+            if(j && j.stats) {
+                Object.entries(j.stats).forEach(([statName, statValue]) => {
+                    if(isEconomyStat(statName)) ecoTotals[statName] = (ecoTotals[statName]||0) + statValue;
+                    else strTotals[statName] = (strTotals[statName]||0) + statValue;
+                });
             }
         });
       });
