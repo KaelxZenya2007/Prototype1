@@ -1,5 +1,4 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -425,8 +424,30 @@
     // 4. GEAR SIMULATOR 
     // ==========================================
     
-    // Dynamic Image Generator for cleaner code
+    // Dynamic Image Generator & URL Mapper
+    const GEAR_ICONS = {
+        "Ancient Hat": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Ancient%20Hat.png",
+        "Beast Helm": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Beast%20Helm.png",
+        "Blight Ring": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Blight%20Ring.png",
+        "Beastly Breastplate": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Beastly%20BreastPlate.png",
+        "Beastly Waist Guard": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Beastly%20Wasteguard.png",
+        "Blizzard Pants": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Blizzard%20Pants.png",
+        "Book of the Dead": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Book%20of%20the%20Dead.png",
+        "Bubble Helm": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/BubbleHelm.png",
+        "Call of the Deep": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Call%20of%20the%20Deep.png",
+        "Champion Armet": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Armet.png",
+        "Champion Blade": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Blade.png",
+        "Champion Blessing": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Blessing.png",
+        "Champion Boots": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Boots.png",
+        "Champion Cuirass": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Cuirass.png",
+        "Champion Blade (Cav)": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Edge.png",
+        "Champion Faith": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Faith.png",
+        "Champion GreatSword": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20GreatSword.png",
+        "Champion Greaves": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Greaves.png"
+    };
+
     function getImg(name) {
+        if (GEAR_ICONS[name]) return GEAR_ICONS[name];
         return `https://placehold.co/100/2d3554/white?text=${encodeURIComponent(name.split(' ')[0])}`;
     }
 
@@ -605,7 +626,7 @@
             
         return `
         <div class="card" onclick="selectGear(${slotIdx}, '${type}', ${item.origIdx})" style="align-items: flex-start;">
-          <img src="${item.img || getImg(item.name)}">
+          <img src="${item.img || getImg(item.name)}" onerror="this.style.display='none'">
           <div style="width: 100%;">
             <div style="font-weight: bold; color: #a4b1f9; font-size: 16px;">${item.name}</div>
             <div style="color: #fff; font-size: 12px; margin-bottom: 5px;">Level ${item.lvl || 60}</div>
@@ -647,7 +668,7 @@
       document.getElementById('modalTitle').textContent = "Manage Jewels";
       
       let html = `<div class="preview-area" style="display:flex; align-items:center; gap:15px;">
-                    <img src="${gear.img || getImg(gear.name)}" style="width:45px; height:45px; border-radius:6px; border:1px solid rgba(255,255,255,0.1);">
+                    <img src="${gear.img || getImg(gear.name)}" style="width:45px; height:45px; border-radius:6px; border:1px solid rgba(255,255,255,0.1);" onerror="this.style.display='none'">
                     <div><strong>${gear.name}</strong><br><span style="font-size:12px; color:var(--muted)">Select a socket to edit.</span></div>
                   </div>`;
                   
@@ -805,7 +826,7 @@
             
             ${item ? `
               <div class="img-box" onclick="openGearSelection(${i})" style="cursor:pointer;" title="Click to change gear">
-                <img src="${item.img || getImg(item.name)}">
+                <img src="${item.img || getImg(item.name)}" onerror="this.style.display='none'">
               </div>
               <div class="actions-group">
                 <button class="btn" onclick="openJewelMenu(${i})">Jewels</button>
