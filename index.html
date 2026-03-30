@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -14,21 +13,29 @@
     body { font-family: 'Segoe UI', Tahoma, Arial, sans-serif; background: #f4f4f4; text-align: center; margin: 0; padding: 10px; color: #333; }
     
     .container { max-width: 900px; margin: auto; background: white; padding: 15px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-    h1 { margin-top: 5px; font-size: 24px; }
-    h2 { margin-top: 5px; }
+    h1 { margin-top: 5px; font-size: 24px; color: #222; }
+    h2 { margin-top: 5px; color: #444; }
     
-    .menu-btn { display: block; width: 100%; max-width: 280px; margin: 10px auto; padding: 12px; border: none; border-radius: 8px; background: #007bff; color: white; cursor: pointer; font-weight: bold; font-size: 15px; }
-    .menu-btn:hover { background: #0056b3; }
-    .tool-input, .tool-select { display: block; width: 100%; max-width: 280px; margin: 10px auto; padding: 12px; border: 1px solid #ccc; border-radius: 6px; text-align: center; font-size: 14px; }
+    .menu-btn { display: block; width: 100%; max-width: 280px; margin: 10px auto; padding: 12px; border: none; border-radius: 8px; background: #007bff; color: white; cursor: pointer; font-weight: bold; font-size: 15px; transition: background 0.2s, transform 0.1s; }
+    .menu-btn:hover { background: #0056b3; transform: translateY(-1px); }
+    .menu-btn:active { transform: translateY(1px); }
+    
+    .tool-input, .tool-select { display: block; width: 100%; max-width: 280px; margin: 10px auto; padding: 12px; border: 1px solid #ccc; border-radius: 6px; text-align: center; font-size: 14px; transition: border-color 0.2s; }
+    .tool-input:focus, .tool-select:focus { outline: none; border-color: #007bff; }
     
     .tool { display: none; width: 100%; padding-bottom: 10px; }
     .guide { display: none; background: #eef; padding: 15px; border-radius: 6px; margin: 15px auto; font-size: 14px; max-width: 280px; border: 1px solid #ccd; text-align: left; }
+
+    /* Expandable Sub-menus for Gem Tool */
+    .adv-group { display: none; background: #fdfdfd; padding: 10px; border-radius: 6px; margin: -5px auto 15px auto; max-width: 280px; border: 1px dashed #bbb; animation: fadeIn 0.3s ease; }
+    .adv-label { display: block; font-size: 11px; color: #888; font-weight: bold; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .adv-group .tool-input { margin: 6px auto; padding: 10px; }
 
     /* =========================================
        2. TROOP & CALC CSS
        ========================================= */
     .game-icon { height: 20px; width: auto; vertical-align: middle; background: #eee; border-radius: 3px; }
-    .sticky-stats { position: sticky; top: 0; z-index: 10; background: #fff; padding: 10px 0; display: flex; justify-content: space-around; border-bottom: 2px solid #eee; margin-bottom: 15px; }
+    .sticky-stats { position: sticky; top: 0; z-index: 10; background: #fff; padding: 10px 0; display: flex; justify-content: space-around; border-bottom: 2px solid #eee; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
     .stat-item { display: flex; align-items: center; font-weight: 800; font-size: 16px; gap: 6px; color: #333; }
     .settings-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; background: #f9f9f9; padding: 12px; border-radius: 8px; border: 1px solid #eee; }
     .input-group { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; text-align: left; }
@@ -36,103 +43,120 @@
     .input-group input[type="number"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; margin: 0; }
     .input-group input[type="checkbox"] { width: 20px; height: 20px; margin: 8px 0; cursor: pointer; }
     .tier-row { border-bottom: 1px solid #eee; padding: 15px 0; }
-    
-    /* UPDATED: Tier Labels Centered */
-    .tier-header { font-weight: 800; color: #007bff; margin-bottom: 10px; font-size: 14px; text-align: center; } 
-    
+    .tier-header { font-weight: 800; color: #007bff; margin-bottom: 10px; font-size: 14px; text-align: center; letter-spacing: 1px; } 
     .tier-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
     .troop-box input { width: 100%; padding: 8px 4px; margin: 0; font-size: 13px; text-align: center; border: 1px solid #ccc; border-radius: 4px; }
     .troop-box label { display: block; font-size: 10px; font-weight: bold; color: #888; text-align: center; margin-bottom: 3px; }
-    
-    /* NEW: Image Box styling for troops */
     .troop-img { width: 35px; height: 35px; object-fit: cover; border-radius: 4px; background: #eaeaea; display: block; margin: 0 auto 5px auto; border: 1px solid #ddd; }
 
-    /* Result Overlay (Toolkit) */
-    .resultTab { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; padding: 15px; }
-    .resultBox { background: white; padding: 25px; border-radius: 10px; width: 100%; max-width: 360px; position: relative; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
-    .closeBtn { position: absolute; right: 15px; top: 10px; font-weight: bold; cursor: pointer; color: red; font-size: 20px; }
+    /* Result Overlay */
+    .resultTab { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); justify-content: center; align-items: center; z-index: 1000; padding: 15px; animation: fadeIn 0.3s ease; }
+    .resultBox { background: white; padding: 25px; border-radius: 12px; width: 100%; max-width: 360px; position: relative; box-shadow: 0 10px 25px rgba(0,0,0,0.4); }
+    .closeBtn { position: absolute; right: 15px; top: 10px; font-weight: bold; cursor: pointer; color: red; font-size: 20px; transition: transform 0.2s; }
+    .closeBtn:hover { transform: scale(1.1); }
     .resultGrid { display: grid; grid-template-columns: 1fr auto; row-gap: 8px; margin-top: 15px; font-size: 15px; }
-    .resultGrid div { text-align: left; display: flex; align-items: center; gap: 8px; }
-    .totalRow { margin-top: 15px; padding-top: 10px; border-top: 2px solid #ccc; font-weight: bold; display: grid; grid-template-columns: 1fr auto; color: #007bff; font-size: 18px; }
-    .precise-time { font-family: monospace; background: #333; color: #00ff00; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 18px; text-align: center; }
+    .resultGrid div { text-align: left; display: flex; align-items: center; gap: 8px; font-weight: 500;}
+    .totalRow { margin-top: 15px; padding-top: 10px; border-top: 2px solid #ccc; font-weight: 800; display: grid; grid-template-columns: 1fr auto; color: #007bff; font-size: 18px; }
+    .precise-time { font-family: monospace; background: #222; color: #00ffcc; padding: 12px; border-radius: 6px; margin: 10px 0; font-size: 18px; text-align: center; box-shadow: inset 0 2px 5px rgba(0,0,0,0.5); }
 
     /* =========================================
-       3. GEAR SIMULATOR CSS
+       3. CHAOS ARENA CSS
+       ========================================= */
+    #chaosResult { margin-top:15px; text-align:left; background:#f9f9f9; padding:15px; border-radius:8px; border:1px solid #ccc; max-height:350px; overflow-y:auto; display:none; box-shadow: inset 0 2px 5px rgba(0,0,0,0.05); }
+    #chaosResult ul { list-style-type: none; padding-left: 0; margin: 10px 0; }
+    #chaosResult li { padding: 6px 0; border-bottom: 1px solid #e0e0e0; font-size: 13px; color: #444; display: flex; justify-content: space-between; }
+    #chaosResult h3 { margin-top: 0; color: #8e44ad; border-bottom: 2px solid #8e44ad; padding-bottom: 5px; font-size: 16px;}
+    .chaos-summary { background: #e8f4fd; padding: 10px; border-radius: 6px; margin-top: 10px; border: 1px solid #bce0fd; }
+    .chaos-summary strong { display: block; color: #0056b3; font-size: 14px; margin-bottom: 4px; }
+
+    /* =========================================
+       4. GEAR SIMULATOR CSS
        ========================================= */
     #gearTool {
-      --bg: #0f1220; --panel: #1a1f3a; --panel-2: #202644; --text: #fff; 
-      --muted: #b6bddf; --accent: #7c9cff; --border: rgba(255,255,255,0.08);
+      --bg: #0b0e17; --panel: #161b2e; --panel-2: #1e2540; --text: #e2e8f0; 
+      --muted: #8e9bb0; --accent: #4da6ff; --accent-glow: rgba(77, 166, 255, 0.4); --border: rgba(255,255,255,0.08);
       --danger: #ff4d4d; --danger-dark: #cc0000;
-      background: var(--bg); color: var(--text); padding: 15px; border-radius: 12px; margin-top: 10px;
+      background: var(--bg); color: var(--text); padding: 20px 15px; border-radius: 12px; margin-top: 10px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
     }
     #gearTool .wrap { max-width: 1000px; margin: 0 auto; }
-    #gearTool .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; gap: 10px; flex-wrap: wrap; }
-    #gearTool .tabs { display: flex; gap: 5px; }
-    #gearTool .tab { padding: 8px 16px; background: var(--panel); border: 1px solid var(--border); color: var(--muted); border-radius: 6px; cursor: pointer; transition: 0.2s; font-size:14px; font-family: inherit;}
-    #gearTool .tab.active { background: var(--accent); color: #fff; border-color: var(--accent); }
-    #gearTool .reset-all-btn { background: var(--danger); color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; font-family: inherit;}
-    #gearTool .reset-all-btn:hover { background: var(--danger-dark); }
+    #gearTool .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; gap: 10px; flex-wrap: wrap; }
+    #gearTool .tabs { display: flex; gap: 8px; background: rgba(0,0,0,0.3); padding: 5px; border-radius: 8px;}
+    #gearTool .tab { padding: 8px 18px; background: transparent; border: none; color: var(--muted); border-radius: 6px; cursor: pointer; transition: all 0.2s; font-size:14px; font-weight: 600; font-family: inherit;}
+    #gearTool .tab:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    #gearTool .tab.active { background: var(--accent); color: #000; box-shadow: 0 0 10px var(--accent-glow); }
+    #gearTool .reset-all-btn { background: rgba(255, 77, 77, 0.1); color: var(--danger); border: 1px solid var(--danger); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: all 0.2s; font-family: inherit;}
+    #gearTool .reset-all-btn:hover { background: var(--danger); color: white; box-shadow: 0 0 10px rgba(255, 77, 77, 0.4); }
     
-    /* Categorized Stats Display */
-    #gearTool .stats-container { background: var(--panel); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border); display: flex; gap: 15px; }
+    #gearTool .stats-container { background: var(--panel); border-radius: 10px; padding: 18px; margin-bottom: 20px; border: 1px solid var(--border); display: flex; gap: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
     #gearTool .stat-col { flex: 1; text-align: left; }
-    #gearTool .stat-col-divider { width: 1px; background: var(--border); }
-    #gearTool .stat-header { font-weight: bold; color: var(--accent); margin-bottom: 10px; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px; text-align: center;}
-    #gearTool .stat-row { display: flex; justify-content: space-between; padding: 4px 0; font-size: 13px; }
+    #gearTool .stat-col-divider { width: 1px; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.1), transparent); }
+    #gearTool .stat-header { font-weight: 800; color: var(--accent); margin-bottom: 12px; font-size: 14px; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 6px; text-align: center; letter-spacing: 1px;}
+    #gearTool .stat-row { display: flex; justify-content: space-between; padding: 5px 0; font-size: 13px; }
     #gearTool .stat-row span { color: var(--muted); }
+    #gearTool .stat-row strong { color: #fff; }
     
-    /* Rigid Grid & Slots for Perfect Alignment */
-    #gearTool .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
-    
-    #gearTool .slot { background: var(--panel); border-radius: 12px; padding: 10px; text-align: center; display: flex; flex-direction: column; align-items: center; border: 1px solid var(--border); height: 100%; min-height: 160px;}
-    
-    #gearTool .slot-label { color: var(--accent); font-weight: bold; text-transform: uppercase; font-size: 10px; margin-bottom: 8px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%;}
-    
-    #gearTool .img-box { width: 100%; aspect-ratio: 1/1; background: #242b4d; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); margin: 0 auto; position: relative; flex: 0 0 auto;}
+    #gearTool .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; align-items: stretch; }
+    #gearTool .slot { background: var(--panel); border-radius: 10px; padding: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; border: 1px solid var(--border); height: 100%; min-height: 160px; box-shadow: 0 2px 8px rgba(0,0,0,0.2); position: relative; overflow: hidden;}
+    #gearTool .slot-label { color: var(--muted); font-weight: bold; text-transform: uppercase; font-size: 10px; margin-bottom: 10px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; letter-spacing: 0.5px;}
+    #gearTool .img-box { width: 100%; aspect-ratio: 1/1; background: #1c223a; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; border: 1px solid rgba(255,255,255,0.05); margin: 0 auto; position: relative; flex: 0 0 auto; transition: all 0.2s;}
     #gearTool .img-box img { width: 100%; height: 100%; object-fit: cover; }
+    #gearTool .slot:has(img) .img-box { border-color: rgba(77, 166, 255, 0.3); box-shadow: 0 0 15px rgba(77, 166, 255, 0.1); }
+    #gearTool .slot:has(img) .slot-label { color: var(--accent); }
+    #gearTool .img-box.empty-box { cursor: pointer; border: 1px dashed rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); }
+    #gearTool .img-box.empty-box:hover { border-color: var(--accent); background: rgba(77, 166, 255, 0.05); transform: scale(1.02); }
     
-    #gearTool .img-box.empty-box { cursor: pointer; border: 1px dashed rgba(255,255,255,0.3); transition: 0.2s; }
-    #gearTool .img-box.empty-box:hover { border-color: var(--accent); background: #2a325a; }
+    #gearTool .btn { cursor: pointer; border: none; border-radius: 5px; padding: 7px; font-size: 11px; font-weight: bold; color: #fff; background: #2c3558; transition: all 0.2s; width: 100%; margin:0; font-family: inherit;}
+    #gearTool .btn:hover { background: #3d4975; transform: translateY(-1px); }
+    #gearTool .btn:active { transform: translateY(0); }
+    #gearTool .btn-plus { width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); font-size: 24px; color: var(--muted); display: flex; align-items: center; justify-content: center; transition: all 0.2s;}
+    #gearTool .empty-box:hover .btn-plus { background: var(--accent); color: #000; border-color: var(--accent); box-shadow: 0 0 10px var(--accent-glow);}
     
-    #gearTool .btn { cursor: pointer; border: none; border-radius: 4px; padding: 6px; font-size: 11px; font-weight: bold; color: white; background: #3d4670; transition: 0.2s; width: 100%; margin:0; font-family: inherit;}
-    #gearTool .btn:hover { background: #4e5a8f; }
-    #gearTool .btn-plus { width: 40px; height: 40px; border-radius: 50%; background: var(--accent); font-size: 24px; color: #fff; display: flex; align-items: center; justify-content: center; font-weight: bold; }
-    
-    #gearTool .actions-group { display: flex; flex-direction: column; gap: 4px; margin-top: auto; padding-top: 8px; width: 100%; }
-    #gearTool .btn-clear { background: rgba(255, 77, 77, 0.15); color: var(--danger); border: 1px solid var(--danger); }
-    #gearTool .btn-clear:hover { background: var(--danger); color: white; }
+    #gearTool .actions-group { display: flex; flex-direction: column; gap: 5px; margin-top: auto; padding-top: 10px; width: 100%; }
+    #gearTool .btn-clear { background: transparent; color: var(--danger); border: 1px solid rgba(255, 77, 77, 0.3); }
+    #gearTool .btn-clear:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
     /* Gear Modal CSS */
-    .g-modal-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; z-index: 2000; padding: 20px; align-items: center; justify-content: center; font-family: 'Segoe UI', Tahoma, sans-serif;}
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+    .g-modal-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: none; z-index: 2000; padding: 20px; align-items: center; justify-content: center; font-family: 'Segoe UI', Tahoma, sans-serif; backdrop-filter: blur(3px); animation: fadeIn 0.2s ease;}
     .g-modal-wrap.open { display: flex; }
-    .g-modal-box { background: #101525; width: 100%; max-width: 500px; max-height: 90vh; border-radius: 15px; display: flex; flex-direction: column; overflow: hidden; color:#fff; text-align: left; }
-    .g-modal-header { padding: 15px; background: #1a1f3a; display: flex; justify-content: space-between; align-items: center; gap: 10px;}
-    .g-modal-body { padding: 15px; overflow-y: auto; flex: 1; }
-    .g-modal-body .card { background: #202644; padding: 12px; border-radius: 10px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: flex-start; gap: 15px; cursor: pointer; }
-    .g-modal-body .card:hover { border-color: #7c9cff; }
-    .g-modal-body .card img { width: 60px; height: 60px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); margin-top: 5px;}
-    .g-modal-body .preview-area { background: #1a1f3a; padding: 15px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #7c9cff; font-size: 14px;}
+    .g-modal-box { background: #121726; width: 100%; max-width: 500px; max-height: 85vh; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; color:#fff; text-align: left; box-shadow: 0 10px 40px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1); animation: slideUp 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);}
+    .g-modal-header { padding: 18px 20px; background: #181e33; display: flex; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);}
+    .g-modal-body { padding: 15px 20px; overflow-y: auto; flex: 1; }
+    
+    .g-modal-body::-webkit-scrollbar { width: 6px; }
+    .g-modal-body::-webkit-scrollbar-track { background: transparent; }
+    .g-modal-body::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+    .g-modal-body::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.2); }
+
+    .g-modal-body .card { background: #1c223a; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: flex-start; gap: 15px; cursor: pointer; transition: all 0.2s; }
+    .g-modal-body .card:hover { border-color: var(--accent); background: #222a46; transform: translateX(2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
+    .g-modal-body .card img { width: 60px; height: 60px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); margin-top: 2px; object-fit: cover;}
+    .g-modal-body .preview-area { background: #161b2e; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--accent); font-size: 14px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);}
     .g-modal-body .jewel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
-    .g-modal-body .socket { background: #242b4d; padding: 8px; border-radius: 6px; font-size: 10px; cursor: pointer; text-align: center; border: 1px solid rgba(255,255,255,0.08); transition: 0.2s; }
-    .g-modal-body .socket:hover { border-color: #7c9cff; }
-    .g-modal-body .btn { cursor: pointer; border: none; border-radius: 4px; padding: 8px; font-size: 12px; font-weight: bold; color: white; background: #3d4670; width: 100%; }
+    .g-modal-body .socket { background: #1c223a; padding: 12px 8px; border-radius: 8px; font-size: 11px; cursor: pointer; text-align: center; border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; font-weight: 600;}
+    .g-modal-body .socket:hover { border-color: var(--accent); background: #222a46; transform: translateY(-2px);}
+    .g-modal-body .btn { cursor: pointer; border: none; border-radius: 6px; padding: 10px; font-size: 12px; font-weight: bold; color: white; background: #2c3558; width: 100%; transition: all 0.2s;}
+    .g-modal-body .btn:hover { background: #3d4975; }
 
     /* Mobile overrides */
     @media (max-width: 600px) {
         .container { padding: 10px; border-radius: 0; box-shadow: none; }
         .tier-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+        #gearTool { padding: 12px; }
         #gearTool .top-bar { justify-content: center; }
-        #gearTool .stats-container { flex-direction: column; gap: 5px; }
-        #gearTool .stat-col-divider { width: 100%; height: 1px; margin: 5px 0; }
-        
-        #gearTool .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
-
-        #gearTool .slot { padding: 6px; min-height: 120px;}
-        #gearTool .slot-label { font-size: 9px; margin-bottom: 4px; letter-spacing: -0.5px;}
-        #gearTool .img-box { border-radius: 5px; }
-        #gearTool .btn { padding: 5px 2px; font-size: 10px; }
+        #gearTool .stats-container { flex-direction: column; gap: 10px; padding: 12px;}
+        #gearTool .stat-col-divider { width: 100%; height: 1px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent); margin: 5px 0; }
+        #gearTool .grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+        #gearTool .slot { padding: 8px; min-height: 130px; border-radius: 8px;}
+        #gearTool .slot-label { font-size: 8px; margin-bottom: 6px; letter-spacing: 0;}
+        #gearTool .img-box { border-radius: 6px; }
+        #gearTool .btn { padding: 6px 2px; font-size: 9px; border-radius: 4px;}
         #gearTool .btn-plus { width: 30px; height: 30px; font-size: 20px; }
-        #gearTool .actions-group { gap: 3px; padding-top: 4px;}
+        #gearTool .actions-group { gap: 4px; padding-top: 6px;}
+        .g-modal-box { max-height: 90vh; }
+        .g-modal-body { padding: 12px; }
     }
 </style>
 </head>
@@ -146,7 +170,8 @@
         <button class="menu-btn" onclick="openTool('speedTool')">Speed Up Calculator</button>
         <button class="menu-btn" onclick="openTool('gemTool')">Gem Prediction</button>
         <button class="menu-btn" onclick="openTool('troopTool')" style="background:#28a745">Troop Calculator</button>
-        <button class="menu-btn" onclick="openTool('gearTool')" style="background:#7c9cff; color:#0f1220;">Gear Simulator</button>
+        <button class="menu-btn" onclick="openTool('chaosTool')" style="background:#8e44ad">Chaos Arena Tracker</button>
+        <button class="menu-btn" onclick="openTool('gearTool')" style="background:#161b2e; border: 2px solid #4da6ff; color:#4da6ff;">Gear Simulator</button>
     </div>
 
     <div id="speedTool" class="tool">
@@ -188,10 +213,22 @@
         <input class="tool-input" id="colo" placeholder="Colosseum Gems (Every 3h)">
         <input class="tool-input" id="guild" placeholder="Daily Guild Gifts">
         <input class="tool-input" id="monster" placeholder="Daily Monster Hunt">
-        <input class="tool-input" id="eventgems" placeholder="Weekly Event Gems">
-        <input class="tool-input" id="treasure" placeholder="Treasure Trove Deposit">
-        <input class="tool-input" id="basic" placeholder="Basic Interest %">
-        <input class="tool-input" id="bonus" placeholder="Bonus Interest %">
+        
+        <input class="tool-input" id="eventgems" placeholder="Base Weekly Events (Tap for more)" onfocus="revealAdv('advEvents')">
+        <div id="advEvents" class="adv-group">
+            <span class="adv-label">Detailed Events (Multipliers applied automatically)</span>
+            <input class="tool-input" id="kParagon" placeholder="Kingdom Paragon">
+            <input class="tool-input" id="hellEv" placeholder="Hell Events">
+            <input class="tool-input" id="gDuel" placeholder="Guild Duel">
+            <input class="tool-input" id="otherEv" placeholder="Other Events">
+        </div>
+
+        <input class="tool-input" id="treasure" placeholder="Treasure Trove Deposit (Tap for int.)" onfocus="revealAdv('advTrove')">
+        <div id="advTrove" class="adv-group">
+             <span class="adv-label">Trove Interest Rates</span>
+            <input class="tool-input" id="basic" placeholder="Basic Interest %">
+            <input class="tool-input" id="bonus" placeholder="Bonus Interest %">
+        </div>
         
         <button class="menu-btn" onclick="calculateGems()">Predict 30 Days</button>
         <button class="menu-btn" onclick="clearInputs('gemTool')" style="background:#6c757d">Clear All</button>
@@ -205,8 +242,8 @@
         </div>
         <div class="settings-grid">
             <div class="input-group"><label>Training Speed %</label><input type="number" id="tSpeed" placeholder="0"></div>
-            <div class="input-group"><label>T1/T2 Sub %</label><input type="number" id="s12" placeholder="0"></div>
-            <div class="input-group"><label>T3/T4 Sub %</label><input type="number" id="s34" placeholder="0"></div>
+            <div class="input-group"><label>T1/T2 Sub % (Max 40)</label><input type="number" id="s12" placeholder="0" max="40" oninput="if(this.value>40)this.value=40;"></div>
+            <div class="input-group"><label>T3/T4 Sub % (Max 30)</label><input type="number" id="s34" placeholder="0" max="30" oninput="if(this.value>30)this.value=30;"></div>
             
             <div class="input-group" style="align-items: center;">
                 <label>120% Event</label>
@@ -218,8 +255,23 @@
         <button class="menu-btn" onclick="clearInputs('troopTool')" style="background:#6c757d; max-width:100%;">Reset All</button>
     </div>
 
+    <div id="chaosTool" class="tool">
+        <button class="menu-btn" onclick="backTools()" style="background:#6c757d; max-width:120px; margin: 0 auto 15px 0;">← Back</button>
+        <h2 style="color: #8e44ad;">Chaos Arena Tracker</h2>
+        
+        <select id="chaosSelect" class="tool-select" onchange="runChaos()">
+            <option value="0">Select a Quest Type...</option>
+            <option value="1">1. Healing T4/T5 Quest</option>
+            <option value="2">2. Wound Enemies T4/T5 Quest</option>
+            <option value="3">3. Gathering Quest</option>
+            <option value="4">4. Destroy Enemy Troops Quest</option>
+        </select>
+
+        <div id="chaosResult"></div>
+    </div>
+
     <div id="gearTool" class="tool">
-        <button class="menu-btn" onclick="backTools()" style="background:#6c757d; max-width:120px; margin: 0 auto 10px 0;">← Back</button>
+        <button class="menu-btn" onclick="backTools()" style="background:#2c3558; max-width:120px; margin: 0 auto 15px 0; border: 1px solid rgba(255,255,255,0.1);">← Back</button>
         
         <div class="wrap">
           <div class="top-bar">
@@ -248,10 +300,10 @@
 <div class="g-modal-wrap" id="mainModal">
   <div class="g-modal-box">
     <div class="g-modal-header">
-      <h3 id="modalTitle" style="margin:0;">Select</h3>
+      <h3 id="modalTitle" style="margin:0; font-size:16px;">Select</h3>
       <div style="display:flex; gap:8px;">
-        <button class="btn" style="width:auto; padding:5px 10px; margin:0; font-size:12px;" onclick="toggleGearSort()">↕ Sort: Lvl</button>
-        <button class="btn btn-clear" style="width:auto; padding:5px 15px; margin:0;" onclick="closeModal()">Close</button>
+        <button class="btn" style="width:auto; padding:6px 12px; margin:0; font-size:12px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1);" onclick="toggleGearSort()">↕ Sort: Lvl</button>
+        <button class="btn btn-clear" style="width:auto; padding:6px 15px; margin:0;" onclick="closeModal()">Close</button>
       </div>
     </div>
     <div class="g-modal-body" id="modalBody"></div>
@@ -279,6 +331,10 @@
         let g = document.getElementById(id);
         g.style.display = (g.style.display === "block") ? "none" : "block";
     }
+    
+    function revealAdv(id){
+        document.getElementById(id).style.display = "block";
+    }
 
     function showResult(content){
         document.getElementById("resultContent").innerHTML = content;
@@ -290,7 +346,9 @@
     }
 
     function parseInput(id){
-        let v = document.getElementById(id).value.replace(/,/g,'');
+        let el = document.getElementById(id);
+        if(!el) return 0;
+        let v = el.value.replace(/,/g,'');
         return Number(v)||0;
     }
     
@@ -310,6 +368,10 @@
             else i.value = ""; 
         });
         if(toolId === 'troopTool') updateLiveStats();
+        if(toolId === 'gemTool'){
+            document.getElementById('advEvents').style.display = 'none';
+            document.getElementById('advTrove').style.display = 'none';
+        }
     }
 
     // ==========================================
@@ -326,8 +388,18 @@
     }
 
     function calculateGems(){
-        let colo=parseInput("colo"), guild=parseInput("guild"), monster=parseInput("monster"), ev=parseInput("eventgems"), tr=parseInput("treasure"), ba=parseInput("basic"), bo=parseInput("bonus");
-        let rColo=Math.floor(colo*8*30), rGuild=Math.floor(guild*30), rMonster=Math.floor(monster*15), rEvent=Math.floor(ev*3), rTreasure=Math.floor(tr*(100+ba+bo)/100);
+        let colo=parseInput("colo"), guild=parseInput("guild"), monster=parseInput("monster");
+        
+        let evBase = parseInput("eventgems") * 4;
+        let p = parseInput("kParagon") * 3;
+        let h = parseInput("hellEv") * 10;
+        let g = parseInput("gDuel") * 2;
+        let o = parseInput("otherEv");
+        let rEvent = evBase + p + h + g + o;
+        
+        let tr=parseInput("treasure"), ba=parseInput("basic"), bo=parseInput("bonus");
+        
+        let rColo=Math.floor(colo*8*30), rGuild=Math.floor(guild*30), rMonster=Math.floor(monster*15), rTreasure=Math.floor(tr*(100+ba+bo)/100);
         let total = rColo + rGuild + rMonster + rEvent + rTreasure;
         showResult("<h3>30-Day Forecast</h3><div class='resultGrid'><div>Colosseum</div><span>"+rColo.toLocaleString()+"</span><div>Guild</div><span>"+rGuild.toLocaleString()+"</span><div>Monster</div><span>"+rMonster.toLocaleString()+"</span><div>Event</div><span>"+rEvent.toLocaleString()+"</span><div>Treasure</div><span>"+rTreasure.toLocaleString()+"</span></div><div class='totalRow'><div>TOTAL GEMS</div><span>"+total.toLocaleString()+"</span></div>");
     }
@@ -417,172 +489,120 @@
         tierContainer.appendChild(row);
     });
 
-    document.getElementById('h-army').src = ICONS.army;
-    document.getElementById('h-might').src = ICONS.might;
+    // ==========================================
+    // 4. CHAOS ARENA TRACKER LOGIC
+    // ==========================================
+    function runChaos() {
+        let choice = parseInt(document.getElementById("chaosSelect").value);
+        let res = document.getElementById("chaosResult");
+        
+        if (choice === 0) {
+            res.style.display = "none";
+            return;
+        }
+        
+        res.style.display = "block";
+        let html = "";
+        let total = 0;
+        let val = 0;
+
+        if (choice === 1 || choice === 2) {
+            val = 25000;
+            let actionType = choice === 1 ? 'heals' : 'wounded';
+            let titleType = choice === 1 ? 'Healing' : 'Wound Enemy';
+            
+            html += `<h3>${titleType} T4/T5 Quest</h3><ul>`;
+            for(let i = 1; i <= 50; i++) {
+                html += `<li><span>Quest ${i}</span> <span><strong>${(val/1000)}k</strong> ${actionType}</span></li>`;
+                total += val;
+                val += 5000;
+            }
+            html += `</ul>`;
+            
+            let displayTotal = total >= 1000000 ? (total/1000000).toFixed(3) + 'm' : (total/1000) + 'k';
+            html += `<div class="chaos-summary">
+                        <strong>Total Needed: ${displayTotal} troops</strong>
+                        <strong>Total Reward Stone: 2500</strong>
+                     </div>`;
+                     
+        } else if (choice === 3) {
+            html += `<h3>Gathering Quest</h3><ul>`;
+            let totalReward = 0;
+            for(let i = 1; i <= 20; i++) {
+                html += `<li><span>Quest ${i}</span> <span>Gather lvl 3 nodes <strong>0/${i}</strong></span></li>`;
+                totalReward += 100;
+            }
+            html += `</ul>`;
+            html += `<div class="chaos-summary">
+                        <strong>Total Reward Stone: ${totalReward}</strong>
+                     </div>`;
+                     
+        } else if (choice === 4) {
+            val = 250000; 
+            html += `<h3>Destroy Enemy Troops (T2 and below)</h3><ul>`;
+            for(let i = 1; i <= 50; i++) {
+                let displayVal = val >= 1000000 ? (val/1000000).toFixed(3) + 'm' : (val/1000) + 'k';
+                html += `<li><span>Quest ${i}</span> <span><strong>${displayVal}</strong> might destroyed</span></li>`;
+                total += val;
+                val += 50000; // Added scaling increment logic based on instruction to improvise
+            }
+            html += `</ul>`;
+            
+            let displayTotal = total >= 1000000 ? (total/1000000).toFixed(3) + 'm' : (total/1000) + 'k';
+            html += `<div class="chaos-summary">
+                        <strong>Total Might Destroyed: ${displayTotal}</strong>
+                        <strong>Total Reward Stone: 2500</strong>
+                     </div>`;
+        }
+        res.innerHTML = html;
+    }
 
     // ==========================================
-    // 4. GEAR SIMULATOR 
+    // 5. GEAR SIMULATOR 
     // ==========================================
+    const GITHUB_BASE = "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/";
     
-    // Dynamic Image Generator & URL Mapper
     const GEAR_ICONS = {
-        "Ancient Hat": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Ancient%20Hat.png",
-        "Beast Helm": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Beast%20Helm.png",
-        "Blight Ring": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Blight%20Ring.png",
-        "Beastly Breastplate": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Beastly%20BreastPlate.png",
-        "Beastly Waist Guard": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Beastly%20Wasteguard.png",
-        "Blizzard Pants": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Blizzard%20Pants.png",
-        "Book of the Dead": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Book%20of%20the%20Dead.png",
-        "Bubble Helm": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/BubbleHelm.png",
-        "Call of the Deep": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Call%20of%20the%20Deep.png",
-        "Champion Armet": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Armet.png",
-        "Champion Blade": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Blade.png",
-        "Champion Blessing": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Blessing.png",
-        "Champion Boots": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Boots.png",
-        "Champion Cuirass": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Cuirass.png",
-        "Champion Blade (Cav)": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Edge.png",
-        "Champion Faith": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Faith.png",
-        "Champion GreatSword": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20GreatSword.png",
-        "Champion Greaves": "https://raw.githubusercontent.com/KaelxZenya2007/Prototype1/main/Champion%20Greaves.png"
+        "Ancient Hat": GITHUB_BASE + "Ancient%20Hat.png", "Beast Helm": GITHUB_BASE + "Beast%20Helm.png", "Blight Ring": GITHUB_BASE + "Blight%20Ring.png", "Beastly Breastplate": GITHUB_BASE + "Beastly%20BreastPlate.png", "Beastly Waist Guard": GITHUB_BASE + "Beastly%20Wasteguard.png", "Blizzard Pants": GITHUB_BASE + "Blizzard%20Pants.png", "Book of the Dead": GITHUB_BASE + "Book%20of%20the%20Dead.png", "Bubble Helm": GITHUB_BASE + "BubbleHelm.png", "Call of the Deep": GITHUB_BASE + "Call%20of%20the%20Deep.png", "Champion Armet": GITHUB_BASE + "Champion%20Armet.png", "Champion Blade": GITHUB_BASE + "Champion%20Blade.png", "Champion Blessing": GITHUB_BASE + "Champion%20Blessing.png", "Champion Boots": GITHUB_BASE + "Champion%20Boots.png", "Champion Cuirass": GITHUB_BASE + "Champion%20Cuirass.png", "Champion Blade (Cav)": GITHUB_BASE + "Champion%20Edge.png", "Champion Faith": GITHUB_BASE + "Champion%20Faith.png", "Champion GreatSword": GITHUB_BASE + "Champion%20GreatSword.png", "Champion Greaves": GITHUB_BASE + "Champion%20Greaves.png", "Champion Helm": GITHUB_BASE + "Champion%20Helm.png", "Champion Katar": GITHUB_BASE + "Champion%20Katar.png", "Champion Lamp": GITHUB_BASE + "Champion%20Lamp.png", "Champion Light": GITHUB_BASE + "Champion%20Light.png", "Champion Mail": GITHUB_BASE + "Champion%20Mail.png", "Champion Plate": GITHUB_BASE + "Champion%20Plate.png", "Champion Stride": GITHUB_BASE + "Champion%20Stride.png", "Champion Valor": GITHUB_BASE + "Champion%20Valor.png", "Champion Visor": GITHUB_BASE + "Champion%20Visor.png", "Dark Aegis": GITHUB_BASE + "Dark%20Aegis.png", "Deadly Mantle": GITHUB_BASE + "Deadly%20Mantle.png", "Decadent Sword": GITHUB_BASE + "Decadent%20Sword.png", "Devourer Helm": GITHUB_BASE + "Devourer%20Helm.png", "Dragon Fist": GITHUB_BASE + "Dragon%27s%20Fist.png", "Dragon's Iris": GITHUB_BASE + "Dragon%27s%20Iris.png", "Dragon Talon": GITHUB_BASE + "Dragon%27s%20Talon.png", "Eerie Lantern": GITHUB_BASE + "Eerie%20Lantern.png", "Eon Axe": GITHUB_BASE + "Eon%20Axe.png", "Eternal Codex": GITHUB_BASE + "Eternal%20Codex.png", "Fear Drum": GITHUB_BASE + "Fear%20Drum.png", "Firewall Plate": GITHUB_BASE + "Firewall%20Plate.png", "Frostwing Armor": GITHUB_BASE + "Frostwing%20Armor.png", "Frostwing's Breath": GITHUB_BASE + "Frostwing%27s%20Breath.png", "Frostwing Helm": GITHUB_BASE + "Frostwing%20Helm.png", "Frostwing Sword": GITHUB_BASE + "Frostwing%20Sword.png", "Gargantua Belt": GITHUB_BASE + "Gargantua%20Belt.png", "Ghostly Cane": GITHUB_BASE + "Ghastly%20Cane.png", "Hardened Carapace": GITHUB_BASE + "Hardened%20Caraspace.png", "Hedonic Cuirass": GITHUB_BASE + "Hedonic%20Cuirass.png", "Horn Cudgel": GITHUB_BASE + "Horn%20Cudgel.png", "Kraken's Anchor": GITHUB_BASE + "Kraken%27s%20Anchor.png", "Legs of the Deceiver": GITHUB_BASE + "Legs%20of%20The%20Deciever.png", "Lunar Boomerang": GITHUB_BASE + "Lunar%20Boomerang.png", "Malicious Saw": GITHUB_BASE + "Malicious%20Saw.png", "Nectar Orb": GITHUB_BASE + "Nectar%20Orb.png", "Orca Mask": GITHUB_BASE + "Orca%20Mask.png", "Polar Ring": GITHUB_BASE + "Polar%20Ring.png", "Predator Pauldrons": GITHUB_BASE + "Predator%20Pauldrons.png", "Rowdy Resolve": GITHUB_BASE + "Rowdy%20Resolve.png", "Serpent Helm": GITHUB_BASE + "Serpant%20Helm.png", "Shadow Helm": GITHUB_BASE + "Shadow%20Helm.png", "Skull Crasher": GITHUB_BASE + "SkullCrusher.png", "Spirit Axe": GITHUB_BASE + "Spirit%20Axe.png", "Stealthy Steps": GITHUB_BASE + "Stealthy%20Steps.png", "Steps of Reckoning": GITHUB_BASE + "Steps%20of%20Reckoning.png", "Storm Tasset": GITHUB_BASE + "Storm%20Assets.png", "Terror Shield": GITHUB_BASE + "Terror%20Shield.png", "Terror Slash": GITHUB_BASE + "Terror%20Slash%20%281%29.png", "Terror Vial": GITHUB_BASE + "Terror%20Vial.png", "Untamed Boots": GITHUB_BASE + "Untamed%20Boots.png", "Venom Blade": GITHUB_BASE + "Venom%20Blade.png", "Viral SwitchBlade": GITHUB_BASE + "Viral%20Switchblade.png", "Winter Mitts": GITHUB_BASE + "Winter%20Mitts.png", "Winter Parka": GITHUB_BASE + "Winter%20Parka.png", "Wyrm Rod": GITHUB_BASE + "Wyrm%20Rod.png", "Wyrm Seal": GITHUB_BASE + "Wyrm%20Seal.png", "Wyrmbone Coronet": GITHUB_BASE + "Wyrmbone%20Coronet.png"
     };
 
     function getImg(name) {
         if (GEAR_ICONS[name]) return GEAR_ICONS[name];
-        return `https://placehold.co/100/2d3554/white?text=${encodeURIComponent(name.split(' ')[0])}`;
+        return `https://placehold.co/100/1c223a/8e9bb0?text=${encodeURIComponent(name.split(' ')[0])}`;
     }
 
-    // --- Master Data ---
     const GEAR_DATA = {
       Legs: [
-        {name:"Champion Boots", lvl: 60, stats:{"Range ATK": 56, "Army ATK": 14, "Army HP": 30.8, "Travel Speed": 70}},
-        {name:"Champion Greaves", lvl: 60, stats:{"Cavalry ATK": 56, "Army ATK": 14, "Army HP": 30.8, "Travel Speed": 70}},
-        {name:"Champion Stride", lvl: 60, stats:{"Infantry ATK": 56, "Army ATK": 14, "Army HP": 30.8, "Travel Speed": 70}},
-        {name:"Blizzard Pants", lvl: 60, stats:{"Range ATK": 42, "Cavalry ATK": 42, "Army DEF": 14, "Army Max HP": 16.8}},
-        {name:"Storm Tasset", lvl: 60, stats:{"Infantry ATK": 42, "Cavalry ATK": 42, "Army DEF": 28, "Army Max HP": 14}},
-        {name:"Dragon Talon", lvl: 60, stats:{"Infantry ATK": 28, "Range ATK": 42, "Army Max HP": 21}},
-        {name:"Gargantua Belt", lvl: 60, stats:{"Cavalry ATK": 52.5, "Cavalry Max HP": 38.5, "Army DEF": 21, "Stone Production Rate": 70}},
-        {name:"Untamed Boots", lvl: 55, stats:{"Cavalry ATK": 28, "Cavalry DEF": 21, "Army Max HP": 21, "Travel Speed": 42}},
-        {name:"Legs of the Deceiver", lvl: 55, stats:{"Range ATK": 7, "Range DEF": 21, "Army ATK": 16.8}},
-        {name:"Beastly Waist Guard", lvl: 50, stats:{"Cavalry ATK": 22.4, "Cavalry Max HP": 16.8, "Army DEF": 16.8}},
-        {name:"Steps of Reckoning", lvl: 50, stats:{"Infantry ATK": 22.4, "Infantry DEF": 16.8, "Infantry Max HP": 11.2}},
-        {name:"Stealthy Steps", lvl: 50, stats:{"Range ATK": 22.4, "Range DEF": 28, "Army Max HP": 11.2}}
+        {name:"Champion Boots", lvl: 60, stats:{"Range ATK": 56, "Army ATK": 14, "Army Max HP": 30.8, "Travel Speed": 70}}, {name:"Champion Greaves", lvl: 60, stats:{"Cavalry ATK": 56, "Army ATK": 14, "Army Max HP": 30.8, "Travel Speed": 70}}, {name:"Champion Stride", lvl: 60, stats:{"Infantry ATK": 56, "Army ATK": 14, "Army Max HP": 30.8, "Travel Speed": 70}}, {name:"Blizzard Pants", lvl: 60, stats:{"Range ATK": 42, "Cavalry ATK": 42, "Army DEF": 14, "Army Max HP": 16.8}}, {name:"Storm Tasset", lvl: 60, stats:{"Infantry ATK": 42, "Cavalry ATK": 42, "Army DEF": 28, "Army Max HP": 14}}, {name:"Dragon Talon", lvl: 60, stats:{"Infantry ATK": 28, "Range ATK": 42, "Army Max HP": 21}}, {name:"Gargantua Belt", lvl: 60, stats:{"Cavalry ATK": 52.5, "Cavalry Max HP": 38.5, "Army DEF": 21, "Stone Production Rate": 70}}, {name:"Untamed Boots", lvl: 55, stats:{"Cavalry ATK": 28, "Cavalry DEF": 21, "Army Max HP": 21, "Travel Speed": 42}}, {name:"Legs of the Deceiver", lvl: 55, stats:{"Range ATK": 7, "Range DEF": 21, "Army ATK": 16.8}}, {name:"Beastly Waist Guard", lvl: 50, stats:{"Cavalry ATK": 22.4, "Cavalry Max HP": 16.8, "Army DEF": 16.8}}, {name:"Steps of Reckoning", lvl: 50, stats:{"Infantry ATK": 22.4, "Infantry DEF": 16.8, "Infantry Max HP": 11.2}}, {name:"Stealthy Steps", lvl: 50, stats:{"Range ATK": 22.4, "Range DEF": 28, "Army Max HP": 11.2}}
       ],
       Armor: [
-        {name:"Champion Plate", lvl: 60, stats:{"Range ATK": 56, "Army DEF": 59.5, "Army Max HP": 35, "Reduce Upkeep": 72.8}},
-        {name:"Terror Shield", lvl: 60, stats:{"Infantry ATK": 49, "Infantry Max HP": 35, "Army Max HP": 29, "Research Speed": 11.2}},
-        {name:"Firewall Plate", lvl: 60, stats:{"Infantry ATK": 28, "Cavalry ATK": 42, "Siege Engine ATK": 42, "Army Max HP": 21}},
-        {name:"Champion Mail", lvl: 60, stats:{"Infantry ATK": 42, "Army ATK": 14, "Army DEF": 49, "Army Max HP": 21, "Reduce Upkeep": 72.8}},
-        {name:"Champion Cuirass", lvl: 60, stats:{"Cavalry ATK": 42, "Army ATK": 14, "Army DEF": 49, "Army Max HP": 21, "Reduce Upkeep": 72.8}},
-        {name:"Beastly Breastplate", lvl: 60, stats:{"Range ATK": 49, "Range Max HP": 21, "Army DEF": 28}},
-        {name:"Hardened Carapace", lvl: 55, stats:{"Range ATK": 35, "Cavalry ATK": 35, "Army DEF": 14}},
-        {name:"Hedonic Cuirass", lvl: 55, stats:{"Infantry ATK": 35, "Range ATK": 35, "Infantry Max HP": 42}},
-        {name:"Frostwing Armor", lvl: 50, stats:{"Infantry ATK": 11.2, "Range ATK": 11.2, "Siege Engine ATK": 17.5}},
-        {name:"Winter Parka", lvl: 50, stats:{"Infantry ATK": 17.5, "Cavalry DEF": 35, "Army Max HP": 21}},
-        {name:"Deadly Mantle", lvl: 50, stats:{"Range ATK": 28, "Trap ATK": 28, "Army DEF": 21}},
-        {name:"Predator Pauldrons", lvl: 50, stats:{"Cavalry ATK": 14, "Cavalry Max HP": 28, "Army DEF": 21, "Travel Speed": 35}}
+        {name:"Champion Plate", lvl: 60, stats:{"Range ATK": 56, "Army DEF": 59.5, "Army Max HP": 35, "Reduce Upkeep": 72.8}}, {name:"Terror Shield", lvl: 60, stats:{"Infantry ATK": 49, "Infantry Max HP": 35, "Army Max HP": 29, "Research Speed": 11.2}}, {name:"Firewall Plate", lvl: 60, stats:{"Infantry ATK": 28, "Cavalry ATK": 42, "Siege Engine ATK": 42, "Army Max HP": 21}}, {name:"Champion Mail", lvl: 60, stats:{"Infantry ATK": 42, "Army ATK": 14, "Army DEF": 49, "Army Max HP": 21, "Reduce Upkeep": 72.8}}, {name:"Champion Cuirass", lvl: 60, stats:{"Cavalry ATK": 42, "Army ATK": 14, "Army DEF": 49, "Army Max HP": 21, "Reduce Upkeep": 72.8}}, {name:"Beastly Breastplate", lvl: 60, stats:{"Range ATK": 49, "Range Max HP": 21, "Army DEF": 28}}, {name:"Hardened Carapace", lvl: 55, stats:{"Range ATK": 35, "Cavalry ATK": 35, "Army DEF": 14}}, {name:"Hedonic Cuirass", lvl: 55, stats:{"Infantry ATK": 35, "Range ATK": 35, "Infantry Max HP": 42}}, {name:"Frostwing Armor", lvl: 50, stats:{"Infantry ATK": 11.2, "Range ATK": 11.2, "Siege Engine ATK": 17.5}}, {name:"Winter Parka", lvl: 50, stats:{"Infantry ATK": 17.5, "Cavalry DEF": 35, "Army Max HP": 21}}, {name:"Deadly Mantle", lvl: 50, stats:{"Range ATK": 28, "Trap ATK": 28, "Army DEF": 21}}, {name:"Predator Pauldrons", lvl: 50, stats:{"Cavalry ATK": 14, "Cavalry Max HP": 28, "Army DEF": 21, "Travel Speed": 35}}
       ],
       Helmet: [
-        {name:"Champion Helm", lvl: 60, stats:{"Cavalry ATK": 49, "Army ATK": 14, "Army Max HP": 49, "Gold Production Rate": 105}},
-        {name:"Wyrmbone Coronet", lvl: 60, stats:{"Range ATK": 45.5, "Range DEF": 28, "Army Max HP": 17.5, "Research Speed": 14}},
-        {name:"Beast Helm", lvl: 60, stats:{"Infantry ATK": 42, "Cavalry ATK": 35, "Army Max HP": 21, "Travel Speed": 45}},
-        {name:"Bubble Helm", lvl: 60, stats:{"Range ATK": 42, "Cavalry ATK": 42, "Army Max HP": 28}},
-        {name:"Champion Visor", lvl: 60, stats:{"Infantry ATK": 35, "Range ATK": 35, "Army ATK": 14, "Army Max HP": 28, "Gold Production Rate": 105}},
-        {name:"Champion Armet", lvl: 60, stats:{"Range ATK": 35, "Cavalry ATK": 35, "Army ATK": 14, "Army Max HP": 28, "Gold Production Rate": 105}},
-        {name:"Serpent Helm", lvl: 60, stats:{"Infantry ATK": 42, "Range ATK": 42, "Infantry Max HP": 21, "Army DEF": 35}},
-        {name:"Ancient Hat", lvl: 55, stats:{"Range ATK": 39.2, "Range DEF": 35, "Army DEF": 21}},
-        {name:"Frostwing Helm", lvl: 50, stats:{"Range ATK": 12.6, "Siege Engine ATK": 10.5, "Army Max HP": 16.1}},
-        {name:"Shadow Helm", lvl: 50, stats:{"Infantry ATK": 14, "Trap ATK": 42, "Trap DEF": 42, "Wall DEF Boost": 21}},
-        {name:"Devourer Helm", lvl: 50, stats:{"Infantry ATK": 18.2, "Cavalry ATK": 18.2, "Cavalry DEF": 14, "Infantry Max HP": 7}},
-        {name:"Orca Mask", lvl: 50, stats:{"Range ATK": 18.2, "Cavalry ATK": 18.2, "Range DEF": 9.8, "Cavalry Max HP": 11.2}}
+        {name:"Champion Helm", lvl: 60, stats:{"Cavalry ATK": 49, "Army ATK": 14, "Army Max HP": 49, "Gold Production Rate": 105}}, {name:"Wyrmbone Coronet", lvl: 60, stats:{"Range ATK": 45.5, "Range DEF": 28, "Army Max HP": 17.5, "Research Speed": 14}}, {name:"Beast Helm", lvl: 60, stats:{"Infantry ATK": 42, "Cavalry ATK": 35, "Army Max HP": 21, "Travel Speed": 45}}, {name:"Bubble Helm", lvl: 60, stats:{"Range ATK": 42, "Cavalry ATK": 42, "Army Max HP": 28}}, {name:"Champion Visor", lvl: 60, stats:{"Infantry ATK": 35, "Range ATK": 35, "Army ATK": 14, "Army Max HP": 28, "Gold Production Rate": 105}}, {name:"Champion Armet", lvl: 60, stats:{"Range ATK": 35, "Cavalry ATK": 35, "Army ATK": 14, "Army Max HP": 28, "Gold Production Rate": 105}}, {name:"Serpent Helm", lvl: 60, stats:{"Infantry ATK": 42, "Range ATK": 42, "Infantry Max HP": 21, "Army DEF": 35}}, {name:"Ancient Hat", lvl: 55, stats:{"Range ATK": 39.2, "Range DEF": 35, "Army DEF": 21}}, {name:"Frostwing Helm", lvl: 50, stats:{"Range ATK": 12.6, "Siege Engine ATK": 10.5, "Army Max HP": 16.1}}, {name:"Shadow Helm", lvl: 50, stats:{"Infantry ATK": 14, "Trap ATK": 42, "Trap DEF": 42, "Wall DEF Boost": 21}}, {name:"Devourer Helm", lvl: 50, stats:{"Infantry ATK": 18.2, "Cavalry ATK": 18.2, "Cavalry DEF": 14, "Infantry Max HP": 7}}, {name:"Orca Mask", lvl: 50, stats:{"Range ATK": 18.2, "Cavalry ATK": 18.2, "Range DEF": 9.8, "Cavalry Max HP": 11.2}}
       ],
       "Main-Hand": [
-        {name:"Champion Blade", lvl: 60, stats:{"Infantry ATK": 28, "Range ATK": 28, "Army ATK": 21, "Army DEF": 23.8, "Research Speed": 21}},
-        {name:"Champion GreatSword", lvl: 60, stats:{"Range ATK": 28, "Cavalry ATK": 28, "Army ATK": 21, "Army DEF": 23.8, "Research Speed": 21}},
-        {name:"Champion Blade (Cav)", lvl: 60, stats:{"Cavalry ATK": 49, "Army ATK": 21, "Army DEF": 23.8, "Research Speed": 21}},
-        {name:"Frostwing Sword", lvl: 60, stats:{"Infantry ATK": 28, "Cavalry ATK": 28, "Range ATK": 17.5}},
-        {name:"Skull Crasher", lvl: 60, stats:{"Range ATK": 21, "Infantry DEF": 35, "Army ATK": 28}},
-        {name:"Ghostly Cane", lvl: 60, stats:{"Infantry ATK": 45.5, "Infantry Max HP": 14, "Army DEF": 14}},
-        {name:"Eon Axe", lvl: 60, stats:{"Cavalry ATK": 52.5, "Cavalry DEF": 14, "Cavalry Max HP": 14}},
-        {name:"Terror Slash", lvl: 55, stats:{"Infantry ATK": 38.5, "Infantry DEF": 14, "Army Capacity": 28, "Construction Speed": 14}},
-        {name:"Horn Cudgel", lvl: 55, stats:{"Cavalry ATK": 42, "Cavalry DEF": 21, "Trap DEF": 49}},
-        {name:"Decadent Sword", lvl: 55, stats:{"Infantry ATK": 35, "Range ATK": 35, "Range DEF": 14, "Infantry Max HP": 14}},
-        {name:"Nectar Orb", lvl: 55, stats:{"Cavalry ATK": 35, "Range ATK": 35, "Cavalry DEF": 14, "Range Max HP": 14}},
-        {name:"Kraken's Anchor", lvl: 55, stats:{"Infantry ATK": 35, "Cavalry ATK": 35, "Infantry DEF": 18.2, "Cavalry Max HP": 18.2}},
-        {name:"Wyrm Rod", lvl: 50, stats:{"Range ATK": 35, "Range Max HP": 24.5, "Timber Production Rate": 70}},
-        {name:"Malicious Saw", lvl: 50, stats:{"Infantry ATK": 35, "Siege Engine ATK": 35, "Infantry DEF": 21, "Siege Engine DEF": 35}}
+        {name:"Champion Blade", lvl: 60, stats:{"Infantry ATK": 28, "Range ATK": 28, "Army ATK": 21, "Army DEF": 23.8, "Research Speed": 21}}, {name:"Champion GreatSword", lvl: 60, stats:{"Range ATK": 28, "Cavalry ATK": 28, "Army ATK": 21, "Army DEF": 23.8, "Research Speed": 21}}, {name:"Champion Blade (Cav)", lvl: 60, stats:{"Cavalry ATK": 49, "Army ATK": 21, "Army DEF": 23.8, "Research Speed": 21}}, {name:"Frostwing Sword", lvl: 60, stats:{"Infantry ATK": 28, "Cavalry ATK": 28, "Range ATK": 17.5}}, {name:"Skull Crasher", lvl: 60, stats:{"Range ATK": 21, "Infantry DEF": 35, "Army ATK": 28}}, {name:"Ghostly Cane", lvl: 60, stats:{"Infantry ATK": 45.5, "Infantry Max HP": 14, "Army DEF": 14}}, {name:"Eon Axe", lvl: 60, stats:{"Cavalry ATK": 52.5, "Cavalry DEF": 14, "Cavalry Max HP": 14}}, {name:"Terror Slash", lvl: 55, stats:{"Infantry ATK": 38.5, "Infantry DEF": 14, "Army Capacity": 28, "Construction Speed": 14}}, {name:"Horn Cudgel", lvl: 55, stats:{"Cavalry ATK": 42, "Cavalry DEF": 21, "Trap DEF": 49}}, {name:"Decadent Sword", lvl: 55, stats:{"Infantry ATK": 35, "Range ATK": 35, "Range DEF": 14, "Infantry Max HP": 14}}, {name:"Nectar Orb", lvl: 55, stats:{"Cavalry ATK": 35, "Range ATK": 35, "Cavalry DEF": 14, "Range Max HP": 14}}, {name:"Kraken's Anchor", lvl: 55, stats:{"Infantry ATK": 35, "Cavalry ATK": 35, "Infantry DEF": 18.2, "Cavalry Max HP": 18.2}}, {name:"Wyrm Rod", lvl: 50, stats:{"Range ATK": 35, "Range Max HP": 24.5, "Timber Production Rate": 70}}, {name:"Malicious Saw", lvl: 50, stats:{"Infantry ATK": 35, "Siege Engine ATK": 35, "Infantry DEF": 21, "Siege Engine DEF": 35}}
       ],
       "Off-Hand": [
-        {name:"Champion Katar", lvl: 60, stats:{"Range ATK": 49, "Cavalry ATK": 42, "Army DEF": 28, "Training Speed": 14}},
-        {name:"Champion Light", lvl: 60, stats:{"Infantry ATK": 49, "Cavalry ATK": 42, "Army DEF": 28, "Training Speed": 14}},
-        {name:"Champion Lamp", lvl: 60, stats:{"Infantry ATK": 49, "Range ATK": 42, "Army DEF": 28, "Training Speed": 14}},
-        {name:"Winter Mitts", lvl: 60, stats:{"Range ATK": 14, "Infantry DEF": 45.5, "Army DEF": 35, "Army Max HP": 35}},
-        {name:"Eternal Codex", lvl: 60, stats:{"Cavalry ATK": 28, "Range ATK": 49, "Cavalry Max HP": 28}},
-        {name:"Lunar Boomerang", lvl: 60, stats:{"Cavalry ATK": 42, "Cavalry DEF": 21, "Cavalry Max HP": 21}},
-        {name:"Eerie Lantern", lvl: 60, stats:{"Infantry ATK": 42, "Infantry DEF": 14, "Infantry Max HP": 14}},
-        {name:"Spirit Axe", lvl: 60, stats:{"Infantry ATK": 35, "Cavalry ATK": 35, "Cavalry Max HP": 14, "Army DEF": 14}},
-        {name:"Venom Blade", lvl: 60, stats:{"Infantry ATK": 35, "Range ATK": 35, "Range DEF": 14, "Army Max HP": 14}},
-        {name:"Dark Aegis", lvl: 50, stats:{"Infantry ATK": 14, "Army ATK": 14}},
-        {name:"Dragon Fist", lvl: 50, stats:{"Cavalry ATK": 30.8, "Army Max HP": 28}},
-        {name:"Viral SwitchBlade", lvl: 50, stats:{"Infantry ATK": 21, "Range ATK": 21, "Siege Engine ATK": 35, "Siege Engine DEF": 28}},
-        {name:"Call of the Deep", lvl: 50, stats:{"Infantry ATK": 21, "Cavalry ATK": 21, "Infantry Max HP": 14, "Cavalry Max HP": 14}}
+        {name:"Champion Katar", lvl: 60, stats:{"Range ATK": 49, "Cavalry ATK": 42, "Army DEF": 28, "Training Speed": 14}}, {name:"Champion Light", lvl: 60, stats:{"Infantry ATK": 49, "Cavalry ATK": 42, "Army DEF": 28, "Training Speed": 14}}, {name:"Champion Lamp", lvl: 60, stats:{"Infantry ATK": 49, "Range ATK": 42, "Army DEF": 28, "Training Speed": 14}}, {name:"Winter Mitts", lvl: 60, stats:{"Range ATK": 14, "Infantry DEF": 45.5, "Army DEF": 35, "Army Max HP": 35}}, {name:"Eternal Codex", lvl: 60, stats:{"Cavalry ATK": 28, "Range ATK": 49, "Cavalry Max HP": 28}}, {name:"Lunar Boomerang", lvl: 60, stats:{"Cavalry ATK": 42, "Cavalry DEF": 21, "Cavalry Max HP": 21}}, {name:"Eerie Lantern", lvl: 60, stats:{"Infantry ATK": 42, "Infantry DEF": 14, "Infantry Max HP": 14}}, {name:"Spirit Axe", lvl: 60, stats:{"Infantry ATK": 35, "Cavalry ATK": 35, "Cavalry Max HP": 14, "Army DEF": 14}}, {name:"Venom Blade", lvl: 60, stats:{"Infantry ATK": 35, "Range ATK": 35, "Range DEF": 14, "Army Max HP": 14}}, {name:"Dark Aegis", lvl: 50, stats:{"Infantry ATK": 14, "Army ATK": 14}}, {name:"Dragon Fist", lvl: 50, stats:{"Cavalry ATK": 30.8, "Army Max HP": 28}}, {name:"Viral SwitchBlade", lvl: 50, stats:{"Infantry ATK": 21, "Range ATK": 21, "Siege Engine ATK": 35, "Siege Engine DEF": 28}}, {name:"Call of the Deep", lvl: 50, stats:{"Infantry ATK": 21, "Cavalry ATK": 21, "Infantry Max HP": 14, "Cavalry Max HP": 14}}
       ],
       Accessory: [
-        {name:"Champion Faith", lvl: 60, stats:{"Infantry ATK": 21, "Cavalry ATK": 21, "Army ATK": 14, "Army Max HP": 35}},
-        {name:"Ambrosial Cup", lvl: 60, stats:{"Infantry ATK": 35, "Range ATK": 35, "Infantry Max HP": 21, "Range Max HP": 21}},
-        {name:"Champion Valor", lvl: 60, stats:{"Cavalry ATK": 21, "Range ATK": 21, "Army ATK": 14, "Army Max HP": 35}},
-        {name:"Champion Blessing", lvl: 60, stats:{"Infantry ATK": 21, "Range ATK": 21, "Army ATK": 14, "Army Max HP": 35}},
-        {name:"Rowdy Resolve", lvl: 60, stats:{"Cavalry ATK": 35, "Cavalry DEF": 10.5, "Cavalry Max HP": 14}},
-        {name:"Book of the Dead", lvl: 60, stats:{"Infantry ATK": 35, "Cavalry ATK": 35, "Cavalry DEF": 28, "Infantry Max HP": 21}},
-        {name:"Polar Ring", lvl: 60, stats:{"Cavalry ATK": 35, "Range ATK": 35, "Cavalry Max HP": 21, "Range Max HP": 21}},
-        {name:"Frostwing's Breath", lvl: 55, stats:{"Infantry ATK": 11.2, "Cavalry ATK": 11.2, "Gold Production Rate": 70}},
-        {name:"Burning Scroll", lvl: 55, stats:{"Army ATK": 12.6, "Army Max HP": 12.6, "Timber Production Rate": 49}},
-        {name:"Dragon's Iris", lvl: 55, stats:{"Cavalry ATK": 14, "Range ATK": 14, "Army Max HP": 14}},
-        {name:"Terror Vial", lvl: 50, stats:{"Infantry ATK": 22.4, "Infantry Max HP": 7, "Army DEF": 11.2, "Ore Production Rate": 49}},
-        {name:"Fear Drum", lvl: 50, stats:{"Cavalry ATK": 22.4, "Siege Engine ATK": 14, "Cavalry Max HP": 7.7, "Gold Production Rate": 49}},
-        {name:"Blight Ring", lvl: 60, stats:{"Range ATK": 19.6, "Army DEF": 21, "Army Max HP": 21, "Wall DEF Boost": 35}},
-        {name:"Wyrm Seal", lvl: 55, stats:{"Range ATK": 22.4, "Siege Engine ATK": 21, "Army Max HP": 11.2, "Stone Production Rate": 49}},
-        {name:"Coil Armband", lvl: 50, stats:{"Infantry ATK": 18.2, "Range ATK": 18.2, "Infantry DEF": 14, "Range Max HP": 11.2}}
+        {name:"Champion Faith", lvl: 60, stats:{"Infantry ATK": 21, "Cavalry ATK": 21, "Army ATK": 14, "Army Max HP": 35}}, {name:"Ambrosial Cup", lvl: 60, stats:{"Infantry ATK": 35, "Range ATK": 35, "Infantry Max HP": 21, "Range Max HP": 21}}, {name:"Champion Valor", lvl: 60, stats:{"Cavalry ATK": 21, "Range ATK": 21, "Army ATK": 14, "Army Max HP": 35}}, {name:"Champion Blessing", lvl: 60, stats:{"Infantry ATK": 21, "Range ATK": 21, "Army ATK": 14, "Army Max HP": 35}}, {name:"Rowdy Resolve", lvl: 60, stats:{"Cavalry ATK": 35, "Cavalry DEF": 10.5, "Cavalry Max HP": 14}}, {name:"Book of the Dead", lvl: 60, stats:{"Infantry ATK": 35, "Cavalry ATK": 35, "Cavalry DEF": 28, "Infantry Max HP": 21}}, {name:"Polar Ring", lvl: 60, stats:{"Cavalry ATK": 35, "Range ATK": 35, "Cavalry Max HP": 21, "Range Max HP": 21}}, {name:"Frostwing's Breath", lvl: 55, stats:{"Infantry ATK": 11.2, "Cavalry ATK": 11.2, "Gold Production Rate": 70}}, {name:"Burning Scroll", lvl: 55, stats:{"Army ATK": 12.6, "Army Max HP": 12.6, "Timber Production Rate": 49}}, {name:"Dragon's Iris", lvl: 55, stats:{"Cavalry ATK": 14, "Range ATK": 14, "Army Max HP": 14}}, {name:"Terror Vial", lvl: 50, stats:{"Infantry ATK": 22.4, "Infantry Max HP": 7, "Army DEF": 11.2, "Ore Production Rate": 49}}, {name:"Fear Drum", lvl: 50, stats:{"Cavalry ATK": 22.4, "Siege Engine ATK": 14, "Cavalry Max HP": 7.7, "Gold Production Rate": 49}}, {name:"Blight Ring", lvl: 60, stats:{"Range ATK": 19.6, "Army DEF": 21, "Army Max HP": 21, "Wall DEF Boost": 35}}, {name:"Wyrm Seal", lvl: 55, stats:{"Range ATK": 22.4, "Siege Engine ATK": 21, "Army Max HP": 11.2, "Stone Production Rate": 49}}, {name:"Coil Armband", lvl: 50, stats:{"Infantry ATK": 18.2, "Range ATK": 18.2, "Infantry DEF": 14, "Range Max HP": 11.2}}
       ]
     };
 
-    // UPDATED JEWEL DATA STRUCTURE
     const JEWEL_DATA = [
-      { name: "Infantry ATK", stats: { "Infantry ATK": 20 } },
-      { name: "Range ATK", stats: { "Range ATK": 20 } },
-      { name: "Cavalry ATK", stats: { "Cavalry ATK": 20 } },
-      { name: "Terror", stats: { "Infantry ATK": 10, "Infantry DEF": 10 } },
-      { name: "Wyrm", stats: { "Range ATK": 10, "Range DEF": 10 } },
-      { name: "Gargantua", stats: { "Cavalry ATK": 10, "Cavalry DEF": 10 } },
-      { name: "Trojan", stats: { "Infantry Max HP": 15, "Travel Speed": 5 } },
-      { name: "Grim", stats: { "Range Max HP": 15, "Travel Speed": 5 } },
-      { name: "Saber", stats: { "Cavalry Max HP": 15, "Travel Speed": 5 } },
-      { name: "Infantry DEF", stats: { "Infantry DEF": 20 } },
-      { name: "Range DEF", stats: { "Range DEF": 20 } },
-      { name: "Cavalry DEF", stats: { "Cavalry DEF": 20 } },
-      { name: "Army Assault", stats: { "Army ATK": 10 } },
-      { name: "IC Assault", stats: { "Infantry ATK": 10, "Cavalry ATK": 5 } },
-      { name: "RI Assault", stats: { "Range ATK": 10, "Infantry ATK": 5 } },
-      { name: "CI Assault", stats: { "Cavalry ATK": 10, "Range ATK": 5 } },
-      { name: "Royal Infantry", stats: { "Infantry ATK": 10, "Infantry Max HP": 10 } },
-      { name: "Royal Range", stats: { "Range ATK": 10, "Range Max HP": 10 } },
-      { name: "Royal Cavalry", stats: { "Cavalry ATK": 10, "Cavalry Max HP": 10 } },
-      { name: "Falcon", stats: { "Infantry ATK": 15, "Range ATK": 15 } },
-      { name: "Dragon Infantry", stats: { "Infantry ATK": 15 } },
-      { name: "Dragon Range", stats: { "Range ATK": 15 } },
-      { name: "Dragon Cavalry", stats: { "Cavalry ATK": 15 } }
+      { name: "Infantry ATK", stats: { "Infantry ATK": 20 } }, { name: "Range ATK", stats: { "Range ATK": 20 } }, { name: "Cavalry ATK", stats: { "Cavalry ATK": 20 } }, { name: "Terror", stats: { "Infantry ATK": 10, "Infantry DEF": 10 } }, { name: "Wyrm", stats: { "Range ATK": 10, "Range DEF": 10 } }, { name: "Gargantua", stats: { "Cavalry ATK": 10, "Cavalry DEF": 10 } }, { name: "Trojan", stats: { "Infantry Max HP": 15, "Travel Speed": 5 } }, { name: "Grim", stats: { "Range Max HP": 15, "Travel Speed": 5 } }, { name: "Saber", stats: { "Cavalry Max HP": 15, "Travel Speed": 5 } }, { name: "Infantry DEF", stats: { "Infantry DEF": 20 } }, { name: "Range DEF", stats: { "Range DEF": 20 } }, { name: "Cavalry DEF", stats: { "Cavalry DEF": 20 } }, { name: "Army Assault", stats: { "Army ATK": 10 } }, { name: "IC Assault", stats: { "Infantry ATK": 10, "Cavalry ATK": 5 } }, { name: "RI Assault", stats: { "Range ATK": 10, "Infantry ATK": 5 } }, { name: "CI Assault", stats: { "Cavalry ATK": 10, "Range ATK": 5 } }, { name: "Royal Infantry", stats: { "Infantry ATK": 10, "Infantry Max HP": 10 } }, { name: "Royal Range", stats: { "Range ATK": 10, "Range Max HP": 10 } }, { name: "Royal Cavalry", stats: { "Cavalry ATK": 10, "Cavalry Max HP": 10 } }, { name: "Falcon", stats: { "Infantry ATK": 15, "Range ATK": 15 } }, { name: "Dragon Infantry", stats: { "Infantry ATK": 15 } }, { name: "Dragon Range", stats: { "Range ATK": 15 } }, { name: "Dragon Cavalry", stats: { "Cavalry ATK": 15 } }
     ];
 
     const SLOT_CONFIG = ["Legs", "Armor", "Helmet", "Main-Hand", "Off-Hand", "Accessory1", "Accessory2", "Accessory3"];
 
-    // --- State ---
     let activeSetIdx = 0;
     let sets = [Array(8).fill(null), Array(8).fill(null), Array(8).fill(null)];
-    
-    // Sort logic
     let gearSortDesc = true; 
     let currentOpenSlot = null;
 
-    // --- Logic ---
     function switchSet(idx) {
       activeSetIdx = idx;
       document.querySelectorAll('.tab').forEach((t, i) => t.classList.toggle('active', i === idx));
@@ -620,19 +640,14 @@
                            .sort((a,b) => gearSortDesc ? b.lvl - a.lvl : a.lvl - b.lvl);
       
       body.innerHTML = sortedList.map(item => {
-        let statsHtml = Object.entries(item.stats)
-            .map(([k,v]) => `${k}: ${v}%`)
-            .join('<br>');
-            
+        let statsHtml = Object.entries(item.stats).map(([k,v]) => `<span style="color:#b6bddf;">${k}:</span> <strong style="color:#fff;">${v}%</strong>`).join('<br>');
         return `
-        <div class="card" onclick="selectGear(${slotIdx}, '${type}', ${item.origIdx})" style="align-items: flex-start;">
-          <img src="${item.img || getImg(item.name)}" onerror="this.style.display='none'">
+        <div class="card" onclick="selectGear(${slotIdx}, '${type}', ${item.origIdx})">
+          <img src="${item.img || getImg(item.name)}" onerror="this.src='https://placehold.co/100/1c223a/8e9bb0?text=Img'">
           <div style="width: 100%;">
-            <div style="font-weight: bold; color: #a4b1f9; font-size: 16px;">${item.name}</div>
-            <div style="color: #fff; font-size: 12px; margin-bottom: 5px;">Level ${item.lvl || 60}</div>
-            <div style="color: #ddd; font-size: 13px; line-height: 1.4;">
-              ${statsHtml}
-            </div>
+            <div style="font-weight: 800; color: #4da6ff; font-size: 15px; margin-bottom: 2px;">${item.name}</div>
+            <div style="color: #8e9bb0; font-size: 11px; margin-bottom: 6px; font-weight: bold; text-transform: uppercase;">Lvl ${item.lvl || 60}</div>
+            <div style="font-size: 12px; line-height: 1.5;">${statsHtml}</div>
           </div>
         </div>
       `}).join('');
@@ -648,16 +663,10 @@
       render();
     }
 
-    // ================================
-    // JEWEL LOGIC (UPDATED)
-    // No duplicate jewel names in one gear
-    // ================================
     function getEquippedJewelNames(slotIdx, excludeJewelIdx = null) {
       const gear = sets[activeSetIdx][slotIdx];
       if (!gear || !Array.isArray(gear.jewels)) return [];
-      return gear.jewels
-        .filter((j, idx) => j && idx !== excludeJewelIdx)
-        .map(j => j.name);
+      return gear.jewels.filter((j, idx) => j && idx !== excludeJewelIdx).map(j => j.name);
     }
 
     function openJewelMenu(slotIdx) {
@@ -668,22 +677,20 @@
       document.getElementById('modalTitle').textContent = "Manage Jewels";
       
       let html = `<div class="preview-area" style="display:flex; align-items:center; gap:15px;">
-                    <img src="${gear.img || getImg(gear.name)}" style="width:45px; height:45px; border-radius:6px; border:1px solid rgba(255,255,255,0.1);" onerror="this.style.display='none'">
-                    <div><strong>${gear.name}</strong><br><span style="font-size:12px; color:var(--muted)">Select a socket to edit.</span></div>
+                    <img src="${gear.img || getImg(gear.name)}" style="width:50px; height:50px; border-radius:6px; border:1px solid rgba(77, 166, 255, 0.3);" onerror="this.src='https://placehold.co/100/1c223a/8e9bb0?text=Img'">
+                    <div><strong style="font-size:16px; color:#4da6ff;">${gear.name}</strong><br><span style="font-size:12px; color:var(--muted)">Select a socket below to equip or swap a jewel.</span></div>
                   </div>`;
                   
       html += `<div class="jewel-grid">`;
       gear.jewels.forEach((j, i) => {
-        html += `<div class="socket" style="padding:15px 5px; background:${j ? '#2a325a' : '#242b4d'}; border-color:${j ? '#7c9cff' : 'rgba(255,255,255,0.08)'}" onclick="chooseJewelForSlot(${slotIdx}, ${i})">
-                    <div style="font-size:18px; margin-bottom:5px; color:${j ? '#7c9cff' : '#555'}">♦</div>
-                    ${j ? j.name : 'Empty'}
+        html += `<div class="socket" style="background:${j ? '#222a46' : '#1c223a'}; border-color:${j ? '#4da6ff' : 'rgba(255,255,255,0.05)'}; box-shadow:${j ? '0 0 10px rgba(77,166,255,0.1)' : 'none'};" onclick="chooseJewelForSlot(${slotIdx}, ${i})">
+                    <div style="font-size:20px; margin-bottom:5px; color:${j ? '#4da6ff' : '#444'}; text-shadow:${j ? '0 0 5px rgba(77,166,255,0.5)' : 'none'};">♦</div>
+                    <span style="color:${j ? '#fff' : '#8e9bb0'}">${j ? j.name : 'Empty Socket'}</span>
                  </div>`;
       });
       html += `</div>`;
       
-      html += `<div style="margin-top: 20px;">
-                 <button class="btn btn-clear" style="padding: 10px;" onclick="clearAllJewels(${slotIdx})">Clear All Jewels</button>
-               </div>`;
+      html += `<div style="margin-top: 25px;"><button class="btn btn-clear" style="padding: 10px; border-radius: 8px;" onclick="clearAllJewels(${slotIdx})">Remove All Jewels</button></div>`;
       
       body.innerHTML = html;
       document.getElementById('mainModal').classList.add('open');
@@ -709,11 +716,12 @@
 
       body.innerHTML = `
         <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-            <button class="btn" style="background: #3d4670;" onclick="openJewelMenu(${slotIdx})">← Back</button>
-            <button class="btn btn-clear" onclick="applyJewel(${slotIdx}, ${jewelIdx}, -1)">Remove This Jewel</button>
+            <button class="btn" style="background: #2c3558; border: 1px solid rgba(255,255,255,0.1);" onclick="openJewelMenu(${slotIdx})">← Back to Sockets</button>
+            <button class="btn btn-clear" onclick="applyJewel(${slotIdx}, ${jewelIdx}, -1)">Unequip Jewel</button>
         </div>
-        <div class="preview-area" style="margin-bottom: 12px;">
-          Socket ${jewelIdx + 1}${currentJewel ? ` — current: <strong>${currentJewel.name}</strong>` : " — current: <strong>Empty</strong>"}
+        <div class="preview-area" style="margin-bottom: 15px; padding: 10px 15px;">
+          <span style="color:var(--muted)">Socket ${jewelIdx + 1}</span><br>
+          Current: <strong style="color:#fff; font-size: 15px;">${currentJewel ? currentJewel.name : "Empty"}</strong>
         </div>
       `;
 
@@ -721,15 +729,16 @@
         const alreadyUsed = usedNames.has(j.name);
         const isCurrent = currentJewel && currentJewel.name === j.name;
 
-        let statsStr = Object.entries(j.stats).map(([k,v]) => `${k} +${v}%`).join(', ');
+        let statsStr = Object.entries(j.stats).map(([k,v]) => `<span style="color:#8e9bb0;">${k}</span> <strong style="color:#fff;">+${v}%</strong>`).join('<br>');
         return `
         <div class="card" onclick="${alreadyUsed && !isCurrent ? '' : `applyJewel(${slotIdx}, ${jewelIdx}, ${i})`}" style="
-             opacity:${alreadyUsed && !isCurrent ? '0.45' : '1'};
-             cursor:${alreadyUsed && !isCurrent ? 'not-allowed' : 'pointer'};
-             border-color:${isCurrent ? '#7c9cff' : 'rgba(255,255,255,0.08)'};">
+             opacity:${alreadyUsed && !isCurrent ? '0.3' : '1'}; cursor:${alreadyUsed && !isCurrent ? 'not-allowed' : 'pointer'};
+             border-color:${isCurrent ? '#4da6ff' : 'rgba(255,255,255,0.05)'}; background:${isCurrent ? '#222a46' : '#1c223a'};">
           <div style="width: 100%;">
-             <strong>${j.name} Jewel${alreadyUsed && !isCurrent ? ' (Already used in this gear)' : ''}${isCurrent ? ' (Selected)' : ''}</strong>
-             <div style="font-size: 11px; color: #b6bddf; margin-top: 3px;">${statsStr}</div>
+             <strong style="color:${isCurrent ? '#4da6ff' : '#fff'}; font-size: 14px;">${j.name} Jewel</strong>
+             ${alreadyUsed && !isCurrent ? '<span style="color:#ff4d4d; font-size:10px; margin-left:5px; font-weight:bold;">[EQUIPPED]</span>' : ''}
+             ${isCurrent ? '<span style="color:#4da6ff; font-size:10px; margin-left:5px; font-weight:bold;">[SELECTED]</span>' : ''}
+             <div style="font-size: 12px; margin-top: 6px; line-height: 1.4;">${statsStr}</div>
           </div>
         </div>
       `}).join('');
@@ -741,49 +750,43 @@
 
       if (dataIdx === -1) {
         gear.jewels[jewelIdx] = null;
-        render();
-        openJewelMenu(slotIdx);
-        return;
+        render(); openJewelMenu(slotIdx); return;
       }
 
       const selected = JEWEL_DATA[dataIdx];
       const usedNames = new Set(getEquippedJewelNames(slotIdx, jewelIdx));
 
       if (usedNames.has(selected.name)) {
-        alert(`"${selected.name}" is already used in another socket on this gear.`);
+        alert(`"${selected.name}" is already equipped in another socket on this gear. You cannot stack identical jewels.`);
         return;
       }
 
       gear.jewels[jewelIdx] = JSON.parse(JSON.stringify(selected));
-      render(); 
-      openJewelMenu(slotIdx);
+      render(); openJewelMenu(slotIdx);
     }
 
-    function closeModal() { 
-        document.getElementById('mainModal').classList.remove('open'); 
-        currentOpenSlot = null;
-    }
+    function closeModal() { document.getElementById('mainModal').classList.remove('open'); currentOpenSlot = null; }
     
-    // Categorization Logic Helper
-    function isEconomyStat(stat) {
-        return /Speed|Production|Upkeep|Capacity/i.test(stat);
+    function isEconomyStat(stat) { return /Speed|Production|Upkeep|Capacity/i.test(stat); }
+    
+    const STAT_ORDER = ["Infantry ATK", "Range ATK", "Cavalry ATK", "Infantry Max HP", "Range Max HP", "Cavalry Max HP", "Infantry DEF", "Range DEF", "Cavalry DEF", "Army ATK", "Army Max HP", "Army DEF"];
+    
+    function sortStatsFunction(a, b) {
+        let idxA = STAT_ORDER.indexOf(a[0]); let idxB = STAT_ORDER.indexOf(b[0]);
+        if (idxA !== -1 && idxB !== -1) return idxA - idxB;
+        if (idxA !== -1) return -1; if (idxB !== -1) return 1;
+        return a[0].localeCompare(b[0]);
     }
 
-    // UPDATED TO READ FROM THE NEW JEWEL.STATS OBJECT
     function render() {
-      const strTotals = {};
-      const ecoTotals = {};
+      const strTotals = {}; const ecoTotals = {};
       
       sets[activeSetIdx].forEach(item => {
         if(!item) return;
-        
-        // Add Gear Stats
         Object.entries(item.stats).forEach(([k,v]) => {
             if(isEconomyStat(k)) ecoTotals[k] = (ecoTotals[k]||0) + v;
             else strTotals[k] = (strTotals[k]||0) + v;
         });
-        
-        // Add Jewel Stats
         item.jewels.forEach(j => { 
             if(j && j.stats) {
                 Object.entries(j.stats).forEach(([statName, statValue]) => {
@@ -795,56 +798,41 @@
       });
 
       const statsBox = document.getElementById('statsDisplay');
+      const sortedStr = Object.entries(strTotals).sort(sortStatsFunction);
+      const sortedEco = Object.entries(ecoTotals).sort(sortStatsFunction);
       
-      const strHtml = Object.keys(strTotals).length ? Object.entries(strTotals).map(([k,v]) => `
-        <div class="stat-row"><span>${k}</span><strong>${v.toFixed(2).replace(/\.00$/, '')}%</strong></div>
-      `).join('') : '<div style="color:var(--muted); text-align:center; font-size:12px; margin-top:10px;">No Strength Stats</div>';
-      
-      const ecoHtml = Object.keys(ecoTotals).length ? Object.entries(ecoTotals).map(([k,v]) => `
-        <div class="stat-row"><span>${k}</span><strong>${v.toFixed(2).replace(/\.00$/, '')}%</strong></div>
-      `).join('') : '<div style="color:var(--muted); text-align:center; font-size:12px; margin-top:10px;">No Economy Stats</div>';
+      const strHtml = sortedStr.length ? sortedStr.map(([k,v]) => `<div class="stat-row"><span>${k}</span><strong>${v.toFixed(2).replace(/\.00$/, '')}%</strong></div>`).join('') : '<div style="color:var(--muted); text-align:center; font-size:12px; margin-top:10px; font-style: italic;">No Combat Stats Active</div>';
+      const ecoHtml = sortedEco.length ? sortedEco.map(([k,v]) => `<div class="stat-row"><span>${k}</span><strong>${v.toFixed(2).replace(/\.00$/, '')}%</strong></div>`).join('') : '<div style="color:var(--muted); text-align:center; font-size:12px; margin-top:10px; font-style: italic;">No Economy Stats Active</div>';
       
       statsBox.innerHTML = `
-        <div class="stat-col">
-            <div class="stat-header">⚔️ Strength</div>
-            ${strHtml}
-        </div>
+        <div class="stat-col"><div class="stat-header" style="color: #ff6666;">⚔️ Combat</div>${strHtml}</div>
         <div class="stat-col-divider"></div>
-        <div class="stat-col">
-            <div class="stat-header">🛡️ Economy</div>
-            ${ecoHtml}
-        </div>
+        <div class="stat-col"><div class="stat-header" style="color: #66ff99;">🛡️ Economy</div>${ecoHtml}</div>
       `;
 
-      // Render Rigid Slots
       const grid = document.getElementById('slotsGrid');
       grid.innerHTML = SLOT_CONFIG.map((label, i) => {
         const item = sets[activeSetIdx][i];
         return `
           <div class="slot">
             <div class="slot-label">${label}</div>
-            
             ${item ? `
-              <div class="img-box" onclick="openGearSelection(${i})" style="cursor:pointer;" title="Click to change gear">
-                <img src="${item.img || getImg(item.name)}" onerror="this.style.display='none'">
+              <div class="img-box" onclick="openGearSelection(${i})" style="cursor:pointer;" title="Swap gear">
+                <img src="${item.img || getImg(item.name)}" onerror="this.src='https://placehold.co/100/1c223a/8e9bb0?text=Img'">
               </div>
               <div class="actions-group">
-                <button class="btn" onclick="openJewelMenu(${i})">Jewels</button>
+                <button class="btn" onclick="openJewelMenu(${i})" style="${item.jewels.some(j=>j) ? 'border: 1px solid #4da6ff; box-shadow: 0 0 5px rgba(77,166,255,0.3);' : ''}">Jewels</button>
                 <button class="btn btn-clear" onclick="clearSingleSlot(${i})">Clear</button>
               </div>
             ` : `
-              <div class="img-box empty-box" onclick="openGearSelection(${i})" title="Click to add gear">
-                <div class="btn-plus">+</div>
-              </div>
-              <div class="actions-group">
-                </div>
+              <div class="img-box empty-box" onclick="openGearSelection(${i})" title="Equip item"><div class="btn-plus">+</div></div>
+              <div class="actions-group"></div>
             `}
           </div>
         `;
       }).join('');
     }
 
-    // Init Gear
     render();
 </script>
 </body>
