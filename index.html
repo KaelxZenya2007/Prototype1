@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -135,12 +133,34 @@
     .g-modal-body .card { background: #1c223a; padding: 12px; border-radius: 8px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: flex-start; gap: 15px; cursor: pointer; transition: all 0.2s; }
     .g-modal-body .card:hover { border-color: var(--accent); background: #222a46; transform: translateX(2px); box-shadow: 0 4px 12px rgba(0,0,0,0.2);}
     .g-modal-body .card img { width: 60px; height: 60px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); margin-top: 2px; object-fit: cover;}
-    .g-modal-body .preview-area { background: #161b2e; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid var(--accent); font-size: 14px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);}
+    .g-modal-body .preview-area { background: #161b2e; padding: 15px; border-radius: 8px; margin-bottom: 15px; font-size: 14px; box-shadow: inset 0 2px 5px rgba(0,0,0,0.2);}
     .g-modal-body .jewel-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 10px; }
     .g-modal-body .socket { background: #1c223a; padding: 12px 8px; border-radius: 8px; font-size: 11px; cursor: pointer; text-align: center; border: 1px solid rgba(255,255,255,0.05); transition: all 0.2s; font-weight: 600;}
     .g-modal-body .socket:hover { border-color: var(--accent); background: #222a46; transform: translateY(-2px);}
     .g-modal-body .btn { cursor: pointer; border: none; border-radius: 6px; padding: 10px; font-size: 12px; font-weight: bold; color: white; background: #2c3558; width: 100%; transition: all 0.2s;}
     .g-modal-body .btn:hover { background: #3d4975; }
+
+    /* Toast Notification CSS */
+    .toast-notification {
+        position: fixed;
+        top: 70%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(22, 27, 46, 0.95);
+        color: #4da6ff;
+        padding: 12px 30px;
+        border-radius: 8px;
+        z-index: 3000;
+        font-size: 15px;
+        font-weight: 800;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        border: 1px solid #4da6ff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+    }
 
     /* Mobile overrides */
     @media (max-width: 600px) {
@@ -416,9 +436,13 @@
     };
     const tiers = [1,2,3,4], types = ["Infantry", "Range", "Cavalry", "Siege"];
     const mPwr = {1:2, 2:8, 3:24, 4:36}, tBase = {1:15, 2:30, 3:60, 4:120};
+    
+    // UPDATED FORMAT: f (food), res (base for specific resource pairing), g (gold)
     const rBase = {
-        1: {f:50, w:50, s:0, o:50, g:0}, 2: {f:100, w:100, s:100, o:0, g:5},
-        3: {f:150, w:0, s:150, o:150, g:10}, 4: {f:1000, w:1000, s:0, o:1000, g:500}
+        1: {f: 50, res: 50, g: 0}, 
+        2: {f: 100, res: 100, g: 5},
+        3: {f: 150, res: 150, g: 10}, 
+        4: {f: 1000, res: 1000, g: 500}
     };
 
     function formatAbbr(n) {
@@ -450,9 +474,21 @@
                 let q = parseInt(document.getElementById(`t${t}${ty}`).value.replace(/,/g,'')) || 0;
                 if(q <= 0) return;
                 r.a += q; r.m += q * mPwr[t]; r.sec += (q * tBase[t]) / mult;
-                r.f += (rBase[t].f * (1-sub)) * q; r.w += (rBase[t].w * (1-sub)) * q;
-                r.s += (rBase[t].s * (1-sub)) * q; r.o += (rBase[t].o * (1-sub)) * q;
-                r.g += (rBase[t].g * (1-sub)) * q;
+                
+                let reqF = rBase[t].f;
+                let reqG = rBase[t].g;
+                let reqW = 0, reqS = 0, reqO = 0;
+
+                if (ty === "Infantry") { reqW = rBase[t].res; reqO = rBase[t].res; }
+                else if (ty === "Range") { reqS = rBase[t].res; reqW = rBase[t].res; }
+                else if (ty === "Cavalry") { reqS = rBase[t].res; reqO = rBase[t].res; }
+                else if (ty === "Siege") { reqW = rBase[t].res; reqS = rBase[t].res; reqO = rBase[t].res; } 
+                
+                r.f += (reqF * (1-sub)) * q; 
+                r.g += (reqG * (1-sub)) * q;
+                r.w += (reqW * (1-sub)) * q;
+                r.s += (reqS * (1-sub)) * q; 
+                r.o += (reqO * (1-sub)) * q;
             });
         });
 
@@ -595,7 +631,7 @@
     };
 
     const JEWEL_DATA = [
-      { name: "Infantry ATK", stats: { "Infantry ATK": 20 } }, { name: "Range ATK", stats: { "Range ATK": 20 } }, { name: "Cavalry ATK", stats: { "Cavalry ATK": 20 } }, { name: "Terror", stats: { "Infantry ATK": 10, "Infantry DEF": 10 } }, { name: "Wyrm", stats: { "Range ATK": 10, "Range DEF": 10 } }, { name: "Gargantua", stats: { "Cavalry ATK": 10, "Cavalry DEF": 10 } }, { name: "Trojan", stats: { "Infantry Max HP": 15, "Travel Speed": 5 } }, { name: "Grim", stats: { "Range Max HP": 15, "Travel Speed": 5 } }, { name: "Saber", stats: { "Cavalry Max HP": 15, "Travel Speed": 5 } }, { name: "Infantry DEF", stats: { "Infantry DEF": 20 } }, { name: "Range DEF", stats: { "Range DEF": 20 } }, { name: "Cavalry DEF", stats: { "Cavalry DEF": 20 } }, { name: "Army Assault", stats: { "Army ATK": 10 } }, { name: "IC Assault", stats: { "Infantry ATK": 10, "Cavalry ATK": 5 } }, { name: "RI Assault", stats: { "Range ATK": 10, "Infantry ATK": 5 } }, { name: "CI Assault", stats: { "Cavalry ATK": 10, "Range ATK": 5 } }, { name: "Royal Infantry", stats: { "Infantry ATK": 10, "Infantry Max HP": 10 } }, { name: "Royal Range", stats: { "Range ATK": 10, "Range Max HP": 10 } }, { name: "Royal Cavalry", stats: { "Cavalry ATK": 10, "Cavalry Max HP": 10 } }, { name: "Falcon", stats: { "Infantry ATK": 15, "Range ATK": 15 } }, { name: "Dragon Infantry", stats: { "Infantry ATK": 15 } }, { name: "Dragon Range", stats: { "Range ATK": 15 } }, { name: "Dragon Cavalry", stats: { "Cavalry ATK": 15 } }
+      { name: "Infantry ATK", stats: { "Infantry ATK": 20 } }, { name: "Range ATK", stats: { "Range ATK": 20 } }, { name: "Cavalry ATK", stats: { "Cavalry ATK": 20 } }, { name: "Terror", stats: { "Infantry ATK": 10, "Infantry DEF": 10 } }, { name: "Wyrm", stats: { "Range ATK": 10, "Range DEF": 10 } }, { name: "Gargantua", stats: { "Cavalry ATK": 10, "Cavalry DEF": 10 } }, { name: "Trojan", stats: { "Infantry Max HP": 15, "Travel Speed": 5 } }, { name: "Grim", stats: { "Range Max HP": 15, "Travel Speed": 5 } }, { name: "Saber", stats: { "Cavalry Max HP": 15, "Travel Speed": 5 } }, { name: "Infantry DEF", stats: { "Infantry DEF": 20 } }, { name: "Range DEF", stats: { "Range DEF": 20 } }, { name: "Cavalry DEF", stats: { "Cavalry DEF": 20 } }, { name: "Army Assault", stats: { "Army ATK": 10 } }, { name: "IC Assault", stats: { "Infantry ATK": 10, "Cavalry ATK": 5 } }, { name: "RI Assault", stats: { "Range ATK": 10, "Infantry ATK": 5 } }, { name: "CI Assault", stats: { "Cavalry ATK": 10, "Range ATK": 5 } }, { name: "Royal Infantry", stats: { "Infantry ATK": 10, "Infantry Max HP": 10 } }, { name: "Royal Range", stats: { "Range ATK": 10, "Range Max HP": 10 } }, { name: "Royal Cavalry", stats: { "Cavalry ATK": 10, "Cavalry Max HP": 10 } }, { name: "Falcon", stats: { "Infantry ATK": 15, "Range ATK": 15 } }, { name: "Dragon Infantry", stats: { "Infantry ATK": 15 } }, { name: "Dragon Range", stats: { "Range ATK": 15 } }, { name: "Dragon Cavalry", stats: { "Cavalry ATK": 15 } }, { name: "Champion Jewel", stats: { "Travel Speed": 20, "Army Max HP": 15 } }
     ];
 
     const SLOT_CONFIG = ["Legs", "Armor", "Helmet", "Main-Hand", "Off-Hand", "Accessory1", "Accessory2", "Accessory3"];
@@ -604,6 +640,20 @@
     let sets = [Array(8).fill(null), Array(8).fill(null), Array(8).fill(null)];
     let gearSortDesc = true; 
     let currentOpenSlot = null;
+
+    // Toast Functionality
+    function showToast(message) {
+        let toast = document.getElementById("toast-notif");
+        if(!toast) {
+            toast = document.createElement("div");
+            toast.id = "toast-notif";
+            toast.className = "toast-notification";
+            document.body.appendChild(toast);
+        }
+        toast.innerText = message;
+        toast.style.opacity = '1';
+        setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+    }
 
     function switchSet(idx) {
       activeSetIdx = idx;
@@ -678,7 +728,7 @@
       const body = document.getElementById('modalBody');
       document.getElementById('modalTitle').textContent = "Manage Jewels";
       
-      let html = `<div class="preview-area" style="display:flex; align-items:center; gap:15px;">
+      let html = `<div class="preview-area" style="display:flex; align-items:center; gap:15px; border-left: 4px solid var(--accent);">
                     <img src="${gear.img || getImg(gear.name)}" style="width:50px; height:50px; border-radius:6px; border:1px solid rgba(77, 166, 255, 0.3);" onerror="this.src='https://placehold.co/100/1c223a/8e9bb0?text=Img'">
                     <div><strong style="font-size:16px; color:#4da6ff;">${gear.name}</strong><br><span style="font-size:12px; color:var(--muted)">Select a socket below to equip or swap a jewel.</span></div>
                   </div>`;
@@ -721,9 +771,9 @@
             <button class="btn" style="background: #2c3558; border: 1px solid rgba(255,255,255,0.1);" onclick="openJewelMenu(${slotIdx})">← Back to Sockets</button>
             <button class="btn btn-clear" onclick="applyJewel(${slotIdx}, ${jewelIdx}, -1)">Unequip Jewel</button>
         </div>
-        <div class="preview-area" style="margin-bottom: 15px; padding: 10px 15px;">
-          <span style="color:var(--muted)">Socket ${jewelIdx + 1}</span><br>
-          Current: <strong style="color:#fff; font-size: 15px;">${currentJewel ? currentJewel.name : "Empty"}</strong>
+        <div class="preview-area" style="margin-bottom: 15px; padding: 15px; text-align: center; border: 2px solid var(--accent); background: rgba(77, 166, 255, 0.05);">
+          <div style="color:var(--accent); font-weight: 900; font-size: 16px; letter-spacing: 1px; margin-bottom: 5px;">SELECTING FOR SOCKET ${jewelIdx + 1}</div>
+          <span style="color:var(--muted); font-size: 12px;">Current: <strong style="color:#fff; font-size: 14px;">${currentJewel ? currentJewel.name : "Empty"}</strong></span>
         </div>
       `;
 
@@ -764,7 +814,22 @@
       }
 
       gear.jewels[jewelIdx] = JSON.parse(JSON.stringify(selected));
-      render(); openJewelMenu(slotIdx);
+      showToast("Jewel Equipped!");
+      
+      let nextEmpty = -1;
+      for (let i = 0; i < 3; i++) {
+          if (!gear.jewels[i]) {
+              nextEmpty = i;
+              break;
+          }
+      }
+
+      render(); 
+      if (nextEmpty !== -1) {
+          chooseJewelForSlot(slotIdx, nextEmpty);
+      } else {
+          openJewelMenu(slotIdx);
+      }
     }
 
     function closeModal() { document.getElementById('mainModal').classList.remove('open'); currentOpenSlot = null; }
