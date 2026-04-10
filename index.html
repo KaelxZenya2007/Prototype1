@@ -1,24 +1,33 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  
+  
+  <!-- Websitr Lauch-->
+   
   <meta name="google-site-verification" content="GcCa05IJW8n3hcV7UPceyqHC8Gm8iI-gLAEdU_qOkMM" />
   
   <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-FL3JQFY6NF"></script>
+
+
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
 
   gtag('config', 'G-FL3JQFY6NF');
-  
 </script>
-  <title>Lords Mobile Tools</title>
+
+
+  <title>
+    Lords Mobile Tools
+  </title>
+  
 <style>
     /* =========================================
        1. GLOBAL TOOLKIT STYLES (Light Theme)
@@ -216,7 +225,9 @@
         
     }
 </style>
+
 </head>
+
 <body>
 
 <div class="container">
@@ -225,15 +236,22 @@
     <div id="toolsMenu">
         <h2>Select a Tool</h2>
         <button class="menu-btn" onclick="openTool('speedTool')">Speed Up Calculator</button>
+        
         <button class="menu-btn" onclick="openTool('gemTool')">Gem Prediction</button>
+        
         <button class="menu-btn" onclick="openTool('troopTool')" style="background:#28a745">Troops Simulation</button>
+        
         <button class="menu-btn" onclick="openTool('chaosTool')" style="background:#8e44ad">Chaos Arena Quest</button>
+        
         <button class="menu-btn" onclick="openTool('gearTool')" style="background:#161b2e; border: 2px solid #4da6ff; color:#4da6ff;">Gear Simulator</button>
+        
         <button class="menu-btn" onclick="openTool('coloTool')" style="background:#fd7e14; border: 2px solid #e86c00; color:white;">Army Colosseum Rotation</button>
+        
     </div>
 
 <div id="coloTool" class="tool">
     <button class="menu-btn" onclick="backTools()" style="background:#6c757d; max-width:120px; margin: 0 auto 15px 0;">← Back</button>
+    
     <h2 style="color: #fd7e14; margin-bottom: 15px;">Army Colosseum Rotation</h2>
     
     <div class="colo-card">
@@ -241,6 +259,7 @@
         <div class="colo-card-value" id="c-current-buff">Loading...</div>
         
         <div class="colo-card-title">Troops Information</div>
+        
         <div style="font-size: 15px; font-weight: 600; color:#333; margin-bottom: 15px;" id="c-current-troop">Loading...</div>
         
         <div class="colo-timers">
@@ -249,6 +268,8 @@
                 <div id="c-timer-next">--d --h --m --s</div>
             </div>
         </div>
+        
+        
     <button class="admin-btn" onclick="toggleAdminPanel()">⚙️ Admin: Sync Rotation</button>
         
     <div id="coloAdminPanel" class="colo-card admin-panel" style="display: none;">
@@ -319,8 +340,11 @@
         <button class="menu-btn" onclick="clearInputs('speedTool')" style="background:#6c757d">Clear All</button>
     </div>
 
+
+
     <div id="gemTool" class="tool">
         <button class="menu-btn" onclick="backTools()" style="background:#6c757d; max-width:120px; margin: 0 auto 15px 0;">← Back</button>
+       
         <h2>Gem Prediction</h2>
         <button class="menu-btn" onclick="toggleGuide('gemGuide')" style="max-width:150px; padding:8px; font-size:12px;">Toggle Guide</button>
         <div id="gemGuide" class="guide">Enter your Estimated Gems or What you usually get from each source.</div>
@@ -349,10 +373,23 @@
         <button class="menu-btn" onclick="clearInputs('gemTool')" style="background:#6c757d">Clear All</button>
     </div>
 
+
     <div id="troopTool" class="tool">
         <button class="menu-btn" onclick="backTools()" style="background:#6c757d; max-width:120px; margin: 0 auto 15px 0;">← Back</button>
+       
         <div class="sticky-stats">
-            <div class="stat-item"><img id="h-army" class="game-icon"> <span id="live-a">0</span></div>
+            <div class="stat-item">
+                <img id="h-army" class="game-icon" alt="Army" onerror="this.style.display='none'"> 
+                <span id="live-a">0</span>
+            </div>
+            
+            <div class="stat-item">
+                <img id="h-might" class="game-icon" alt="Might" onerror="this.style.display='none'"> 
+                <span id="live-m">0</span>
+            </div>
+        </div>
+
+            
             <div class="stat-item"><img id="h-might" class="game-icon"> <span id="live-m">0</span></div>
         </div>
         <div class="settings-grid">
@@ -751,6 +788,14 @@ function syncColoRotation() {
         });
         tierContainer.appendChild(row);
     });
+    
+    // ==========================================
+    // INITIALIZATION: Load Live Review Icons
+    // ==========================================
+    // This tells the browser to grab the filenames from your ICONS dictionary 
+    // and push them into the live header when the tool loads.
+    document.getElementById('h-army').src = ICONS.army;
+    document.getElementById('h-might').src = ICONS.might;
 
     // ==========================================
     // 5. CHAOS ARENA TRACKER LOGIC
@@ -1277,3 +1322,4 @@ function syncColoRotation() {
 </script>
 </body>
 </html>
+
